@@ -1,0 +1,71 @@
+.assignmentHeader{
+    text-align: left;
+font: normal normal bold 26px/34px Roboto;
+letter-spacing: 0px;
+color: #2A2D2F;
+opacity: 1;
+}
+
+.assignmentName{
+    text-align: left;
+font: normal normal normal 20px/34px Roboto;
+letter-spacing: 0px;
+color: #2A2D2F;
+opacity: 1;
+}
+
+.assignmentNameHeader{
+    box-shadow: 0px 3px 6px #B4B3B329;
+    height: 84px;
+}
+
+.assignmentDataInner{
+    width: 65%;
+height: auto;
+/* UI Properties */
+background: #FFFFFF 0% 0% no-repeat padding-box;
+box-shadow: 0px 3px 4px #0000001A;
+border: 1px solid #D8D8D8;
+border-radius: 8px;
+opacity: 1;
+padding: 23px 38px;
+margin-left: 2%;
+}
+
+/* .questionSetHeader{
+
+} */
+
+.questionSetSidebar{
+    width: 30%;
+    height: auto;
+    /* UI Properties */
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 4px #0000001A;
+    border: 1px solid #D8D8D8;
+    border-radius: 8px;
+}
+
+.questionSetHeaderText{
+    text-align: left;
+font: normal normal bold 26px/34px Roboto;
+letter-spacing: 0px;
+color: #2A2D2F;
+opacity: 1;
+}
+
+.questionSetText{
+    text-align: left;
+    font: normal normal bold 20px/34px Roboto;
+    letter-spacing: 0px;
+    color: #2A2D2F;
+    opacity: 1;
+}
+
+.fillBlankAnswer{
+    width: 100%;
+    height: 40px;
+    margin-bottom: 36px;
+    border: none;
+    border-bottom: 1px solid;
+}

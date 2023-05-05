@@ -1,0 +1,39 @@
+.ModalContentMain {
+    height: 539px;
+    width: 876px;
+    background-color: white;
+    border-radius: 1%;
+}
+
+.loginForm{
+    margin-top: 42px;
+    position: relative;
+    left: 42px;
+}
+
+.loginForm h1 {
+    padding: 1px 102px;
+}
+
+.loginImageContent{
+    width: 304px;
+    position: relative;
+    right: 10px;
+}
+
+.loginFormContent{
+    margin-top: 37px;
+    padding: 10px 100px;
+}
+
+.loginFormContent .mb-2{
+    padding-bottom: 14px;
+}
+
+.loginBtn{
+    width: 160px;
+height: 48px;
+background: #2F5CE0 0% 0% no-repeat padding-box;
+opacity: 1;
+margin-top: 40px;
+}

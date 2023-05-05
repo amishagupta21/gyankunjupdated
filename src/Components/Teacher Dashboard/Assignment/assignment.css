@@ -1,0 +1,43 @@
+.assignmentSectionOuter{
+    height: auto;
+    width: 100%;
+}
+
+.fillBlankQuest{
+    width: 100%;
+    height: 40px;
+    border-radius: 10px;
+    margin-bottom: 36px;
+}
+
+.addFillBlankSection {
+    padding: 0px 52px 0px 97px;
+}
+
+.addSingleSelect{
+    margin-bottom: 15px;
+}
+
+.correctAnsInput {
+    height: 40px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.assignmentData{
+    padding: 10px;
+}
+
+.assignmentCardExpanded{
+    margin-bottom: 10px; 
+    height: auto;
+    max-height: 500px;
+    /* padding: 30px; */
+}
+
+.assignmentCard{
+    margin-bottom: 10px;
+    height: 55px;
+    overflow: hidden;
+}
+
