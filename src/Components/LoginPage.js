@@ -26,7 +26,7 @@ const LoginPage = (props) => {
   const loginMember = (e) => {
     let base64 = require("base-64");
 
-    let url = "/login";
+    let url = "http://13.200.112.20:5005/login";
     let username = userName;
     let password = passwordd;
 
