@@ -1,0 +1,20 @@
+.question {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+.newQuesion {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.content {
+    margin: 30px;
+}
+
+.add_button {
+    margin-top: 40px;
+}
