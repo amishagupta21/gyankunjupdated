@@ -1,0 +1,10 @@
+.question_basis {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: larger;
+    font-weight: 600;   
+}
+.questiondetail {
+    font-size: medium;
+    font-weight: 500;
+}
