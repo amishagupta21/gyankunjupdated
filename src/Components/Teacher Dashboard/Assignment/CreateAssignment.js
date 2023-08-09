@@ -8,7 +8,6 @@ import {
     getGradeDetails,
     createAssignment
 } from "../../../ApiClient";
-import '../../../dist/output.css'
 
 const CreateAssignment = () => {
     const navigate = useNavigate();

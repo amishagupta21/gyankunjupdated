@@ -5,7 +5,6 @@ import TeacherSidebar from "../TeacherSidebar";
 import { getQuestions, SaveAssignmentData, publishAssignmentData } from '../../../ApiClient'
 import BaseQuestion from './QuestionForm/base';
 import Question from './Question';
-import './output.css';
 const Addquestions = () => {
     const navigate = useNavigate();
     const location = useLocation();
