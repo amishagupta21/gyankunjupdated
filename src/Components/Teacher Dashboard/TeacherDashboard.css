@@ -257,7 +257,6 @@ td {
     margin-top: 94px;
     margin-left: 4%;
     margin-bottom: 2%;
-    height: 249px;
     background: #FFFFFF 0% 0% no-repeat padding-box;
     box-shadow: 0px 3px 4px #0000001A;
     border: 1px solid #EFF1F4;
@@ -265,8 +264,8 @@ td {
     opacity: 1;
     /* overflow: hidden;
 overflow-y: auto; */
-    max-height: 631px;
-    height: 631px;
+    max-height: 1000px;
+    height: 1000px;
 }
 
 .reportSection h4 {
