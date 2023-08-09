@@ -1,20 +1,32 @@
 import axios from 'axios'
 
-const apiInstance = axios.create();
 
-apiInstance.interceptors.request.use(async(config) => {
-    const token = JSON.parse(localStorage.getItem('UserData'))
-    const tokenId = token.token
-    config.headers = {
-        'x-access-tokens': tokenId
-    }
-    // console.log(config)
-    return config;
-})
 
 // const loginUser = (data) => {
 //     return apiInstance.post(`/login`, data)
 // }
+const apiInstance = axios.create({
+    baseURL: "http://13.200.112.20:5005"
+});
+
+async function handleAPI(recdConfig) {
+    const config = recdConfig;
+    const token = JSON.parse(localStorage.getItem('UserData'))
+    const tokenId = token.token
+    try {
+        config.headers["x-access-tokens"] = tokenId;
+        return config;
+    } catch (err) {
+        return config;
+    }
+}
+
+apiInstance.interceptors.request.use(
+    async (recdConfig) => {
+        return handleAPI(recdConfig);
+    },
+    (error) => Promise.reject(error)
+);
 
 const createMasterRoutine = (data) => {
     return apiInstance.post(
@@ -38,11 +50,11 @@ const attendanceOverview = (grade, section) => {
     return apiInstance.get(`/get_attendance_overview?grade_id=${grade}&section_id=${section}`)
 }
 
-const getReports= (grade, section, userType) => {
+const getReports = (grade, section, userType) => {
     return apiInstance.get(`/view_report?grade_id=${grade}&section_id=${section}&user_type=${userType}`)
 }
 
-const getResources= (grade, section, subject) => {
+const getResources = (grade, section, subject) => {
     return apiInstance.get(`/get_content?grade_id=${grade}&section_id=${section}&subject_id=${subject}`)
 }
 
@@ -58,11 +70,11 @@ const viewAttendanceReport = (grade, section, year, userType) => {
     return apiInstance.get(`/view_attendance_report?grade_id=${grade}&section_id=${section}&year=${year}&user_type=${userType}`)
 }
 
-const getLessonPlan= (teacher) => {
+const getLessonPlan = (teacher) => {
     return apiInstance.get(`/view_teacher_lesson_plan?teacher_id=${teacher}`)
 }
 
-const getLessonPlanMetadata= (grade, section) => {
+const getLessonPlanMetadata = (grade, section) => {
     return apiInstance.get(`/get_lesson_plan_metadata?grade_id=${grade}&section_id=${section}`)
 }
 
@@ -150,10 +162,18 @@ const publishAssignmentData = (id) => {
 const loadAssignmentData = (AssignmentId, userId) => {
     return apiInstance.get(`/load_assignment?assignment_id=${AssignmentId}&student_id=${userId}`)
 }
+const getQuestions = (assignment_id) => {
+    return apiInstance.get(`/view_assignment_details?assignment_id=${assignment_id}`);
+}
+const deleteAssignment = (assignment_id) => {
+    return apiInstance.delete(`/delete_assignment?assignment_id=${assignment_id}`);
+}
 
 
 export {
     // loginUser,
+    deleteAssignment,
+    getQuestions,
     createMasterRoutine,
     getMasterRoutineData,
     viewLogBook,
