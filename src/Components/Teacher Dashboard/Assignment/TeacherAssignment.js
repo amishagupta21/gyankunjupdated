@@ -344,7 +344,7 @@ const TeacherAssignment = () => {
                             <td>{item?.assignment_type_name}</td>
                             <td>{item?.assignment_duration}</td>
                             <td>
-                              {item?.is_published ? (<h1><Badge bg="primary">Publish</Badge></h1>) : (<h1><Badge bg="secondary">draft</Badge></h1>)}
+                              {item?.is_published ? (<h5><Badge bg="primary">Publish</Badge></h5>) : (<h5><Badge bg="secondary">draft</Badge></h5>)}
                             </td>
                             <td className="flex gap-6">
                               {!item?.is_published && (

@@ -35,13 +35,14 @@ const LoginPage = (props) => {
       "Authorization",
       "Basic " + base64.encode(username + ":" + password)
     );
-
+    console.log(username, password);
+    console.log("HEADERS",headers.get("Authorization"));
     let data = trackPromise(fetch(url, { method: "POST", headers: headers })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        // console.log("data - ", data);
+         console.log("data - ", data);
         if (data.status === "success") {
           let user = localStorage.setItem("UserData", JSON.stringify(data));
           props.onHide();
@@ -71,7 +72,6 @@ const LoginPage = (props) => {
         console.log(err);
       }));
   };
-
 
 
   return (

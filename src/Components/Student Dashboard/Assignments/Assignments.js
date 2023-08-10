@@ -14,10 +14,12 @@ const StudentAssigments = () => {
 
     useEffect(() => {
         fetchStudentAssignments();
+        console.log("LIST",assignmentFullList);
     }, [])
 
     const fetchStudentAssignments = () => {
         const student_id = userDetails.user_id
+        console.log("ID",student_id);
         studentAssignmentList(student_id)
         .then((res) => setAssignmentFullList(res.data))
         .catch((err) => console.log("Assignment Tab err - ", err))

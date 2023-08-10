@@ -1,51 +1,84 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Form, Modal, Row, Col, Card } from "react-bootstrap";
 import './studentAssignment.css'
 
-const AnswerTypeSubjective = ({...props}) => {
-    return (
-      <>
-        {/* <Row> */}
-          {/* <Col md={4} className="questionSetSidebar">
-            {" "}
-            Sidebar
-          </Col> */}
-          {/* <Col md={8} className="assignmentDataInner"> */}
-            <Row>
-              <Col md={9} className="questionSetHeaderText">
-                <p>Subjective Question</p>
-              </Col>
-            </Row>
-            {props?.assignmentFullData?.assignment_data?.assignmentDataForStudent?.map((subjective, indx) => {
-                return subjective?.type === 'subjective' && <Row>
-                <Col md={10} className="questionSetHeader">
-                  <p className="questionSetText">
-                    {subjective?.question}
-                  </p>
-                </Col>
-                <Col md={2}>
-                  <p className="questionSetText">{subjective?.marks}</p>
-                </Col>
-              </Row>
-            }) }
-            <Row>
-              <Col md={6}>
-                <p>Enter your Answer</p>
-                <textarea
-                rows="4"
-                cols="50"
-                  type="text"
-                  placeholder="Answer"
-                  className="fillBlankAnswer"
-                //   onChange={(e) => handleQuestionData(e)}
-                ></textarea>
-              </Col>
-            </Row>
-            <hr />
-          {/* </Col> */}
-        {/* </Row> */}
-      </>
-    );
+const AnswerTypeSubjective = (props) => {
+
+  const [validated, setValidated] = useState(false);
+  const [testanswer,setTestAnswer] = useState("");
+  useEffect(() => {
+    setTestAnswer(props.question.test_answer);
+  },[])
+
+
+  const handleChange = (e) => {
+    setTestAnswer(e.target.value);
+  }
+  const handleCancel = () => {
+    setTestAnswer("");
+    setValidated(false)
+  }
+
+  const handleSave = (e) => {
+    const form = document.getElementById("form");
+    console.log(form)
+    if (form.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    else {
+      let data = {
+        type: "4",
+        question: props.question.question,
+        all_options: props.question.all_options,
+        marks: props.question.marks,
+        answer: props.question.answer,
+        test_answer : testanswer,
+        
+      }
+      console.log("Data",data)
+      props.handle(data,props.idx);
+    }
+    setValidated(true);
+  }
+
+
+  return (
+    <>
+      <Row>
+        <Col md={12} style={{
+          background: "#7A9ABF 0% 0% no-repeat padding-box",
+          borderRadius: "4px 4px 0px 0px",
+          opacity: "1",
+        }}><h2>Question:{props.question.question}</h2></Col>
+      </Row>
+      <br />
+      <Row>
+        <Col md={9}>
+          <Form id="form" noValidate validated={validated}>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+              <Form.Label><h6>Correct Answer</h6></Form.Label>
+              <Form.Control as="textarea" rows={5} value={testanswer} onChange={e => handleChange(e)} required />
+            </Form.Group>
+          </Form>
+        </Col>
+      </Row>
+      <br />
+      <Row>
+        <Col md={9}></Col>
+        <Col md={3}>
+          <Row>
+            <Col md={6}>
+              <Button variant='outline-primary' onClick={handleCancel}>Cancel</Button>
+            </Col>
+            <Col md={6}>
+              <Button variant='primary' onClick={handleSave}>Save</Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </>
+  );
 }
 
 export default AnswerTypeSubjective

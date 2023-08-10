@@ -52,7 +52,8 @@ const BaseQuestion = (props) => {
                     type: type,
                     marks: marks,
                     all_options: [],
-                    answer: data.answer
+                    answer: data.answer,
+                    test_answer : ""
                 }
                 console.log(temp);
                 props.handle(temp);
@@ -67,7 +68,8 @@ const BaseQuestion = (props) => {
                     type: type,
                     marks: marks,
                     all_options: ttt,
-                    answer: data.answer
+                    answer: data.answer,
+                    test_answer : ""
                 }
                 props.handle(temp);
                 console.log(temp);
@@ -85,7 +87,8 @@ const BaseQuestion = (props) => {
                     type: type,
                     marks: marks,
                     all_options: ttt,
-                    answer: ans
+                    answer: ans,
+                    test_answer : []
                 }
                 props.handle(temp);
                 console.log(temp);
