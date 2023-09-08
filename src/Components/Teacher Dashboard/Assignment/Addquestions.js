@@ -92,7 +92,10 @@ const Addquestions = () => {
                                 width: "100%",
                             }}>
                             <Col md={9}>
+                                <div className='d-flex flex-row align-items-center'>
                                 <h4>Add Questions</h4>
+                                <BaseQuestion id={id} handle={handle} />
+                                </div>
                             </Col>
                             <Col
                                 md={3}
@@ -106,31 +109,25 @@ const Addquestions = () => {
                                 <Button variant="outline-primary">Go to Assignments</Button>
                             </Col>
                         </Row>
+                              {questions.length > 0 ? (
+
+                                    <div className='d-flex justify-content-end my-2 mx-5'>
+                                            <Button variant="outline-primary " onClick={handleBack} >Back</Button>
+                                            <Button variant="outline-primary mx-2" onClick={handleSave}>Save</Button>
+                                            <Button variant="outline-primary" onClick={handlePublish} >Publish</Button>
+                                    </div>
+                                ) : (<></>)}
                         <Row>
-                            <Col md={7} style={{ marginTop: "45px" }}>
+                            <Col  style={{ marginTop: "45px" }}>
                                 {questions?.map((data, index) => {
                                     return (
                                         <Question data={data} index={index} />
                                     )
                                 })}
-                                {questions.length > 0 ? (
-                                    <Row>
-                                        <Col md={4}>
-                                            <Button variant="outline-primary" onClick={handleBack} style={{ marginLeft: "200px" }}>Back</Button>
-                                        </Col>
-                                        <Col md={4}>
-                                            <Button variant="outline-primary" onClick={handleSave}>Save</Button>
-                                        </Col>
-                                        <Col md={4}>
-                                            <Button variant="outline-primary" onClick={handlePublish} style={{ marginRight: "200px" }}>Publish</Button>
-                                        </Col>
-                                    </Row>
-                                ) : (<></>)}
+                          
 
                             </Col>
-                            <Col md={5} style={{ marginTop: "45px" }}>
-                                <BaseQuestion id={id} handle={handle} />
-                            </Col>
+                           
                         </Row>
                     </div>
 

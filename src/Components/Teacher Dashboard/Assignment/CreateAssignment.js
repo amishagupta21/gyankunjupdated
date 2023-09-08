@@ -142,6 +142,7 @@ const CreateAssignment = () => {
                 </Col>
                 <Col md={9} style={{ width: "80%" }}>
                     <div className="reportSection" >
+                        
                         <Row
                             style={{
                                 height: "74px",
@@ -163,7 +164,7 @@ const CreateAssignment = () => {
                                     }
                                 }
                             >
-                                <Button variant="outline-primary">Go to Assignments</Button>
+                                <Button variant="outline-primary">Go to Assignments fff</Button>
                             </Col>
                         </Row>
                         <Form>
@@ -210,6 +211,7 @@ const CreateAssignment = () => {
                                                 className="lessonPlanSubject"
                                                 style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
                                                 value={section}
+                                                disabled={assignmentGrade?false:true}
                                                 onChange={e => handleSection(e)}
                                             >
                                                 <option value="">--Section--</option>
