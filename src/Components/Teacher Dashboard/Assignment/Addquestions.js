@@ -111,9 +111,9 @@ const Addquestions = () => {
                         </Row>
                               {questions.length > 0 ? (
 
-                                    <div className='d-flex justify-content-end my-2 mx-5'>
+                                    <div className='d-flex justify-content-end mt-4 mx-5'>
                                             <Button variant="outline-primary " onClick={handleBack} >Back</Button>
-                                            <Button variant="outline-primary mx-2" onClick={handleSave}>Save</Button>
+                                            <Button variant="outline-primary mx-3" onClick={handleSave}>Save</Button>
                                             <Button variant="outline-primary" onClick={handlePublish} >Publish</Button>
                                     </div>
                                 ) : (<></>)}
