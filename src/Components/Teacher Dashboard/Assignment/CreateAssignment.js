@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'
-import { Row, Col, Button, Form, Table } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
+import { Row, Col, Button, Form } from "react-bootstrap";
 import TeacherSidebar from "../TeacherSidebar";
 import CustomToast from './Toast';
 import {
@@ -8,6 +8,7 @@ import {
     getGradeDetails,
     createAssignment
 } from "../../../ApiClient";
+import "./createAssignment.css"
 
 const CreateAssignment = () => {
     const navigate = useNavigate();
@@ -21,9 +22,9 @@ const CreateAssignment = () => {
     const [assignmentGrade, setAssignmentGrade] = useState("");
     const [gradeDetailList, setGradeDetailList] = useState([]);
     const [sectionList, setSectionList] = useState([]);
-    const [section, setSection] = useState(""); //id,not value
+    const [section, setSection] = useState("");
     const [subjectList, setSubjectList] = useState([]);
-    const [subject, setSubject] = useState({});
+    // const [subject, setSubject] = useState({});
     const [type, setType] = useState("");
     const [duration, setDuration] = useState("0");
     const [chapter, setChapter] = useState("");
@@ -32,21 +33,46 @@ const CreateAssignment = () => {
         { value: "2", label: "Home Work" },
         { value: "3", label: "Test" },
     ];
+    const [firstTwoFieldsCompleted, setFirstTwoFieldsCompleted] = useState(false);
+    const [secondFieldCompleted, setSecondFieldCompleted] = useState(false);
+    const [thirdFieldCompleted, setThirdFieldCompleted] = useState(false);
+    const [subject, setSubject] = useState(null);
+
+    const [fourthFieldCompleted, setFourthFieldCompleted] = useState(false);
+    const [fifthFieldCompleted, setFifthFieldCompleted] = useState(false);
+
+    useEffect(() => {
+        setFirstTwoFieldsCompleted(assignmentName !== "" && assignmentGrade !== "");
+    }, [assignmentName, assignmentGrade]);
+
+    useEffect(() => {
+        setSecondFieldCompleted(section !== "");
+    }, [section]);
+
+    useEffect(() => {
+        setThirdFieldCompleted(subject !== null);
+    }, [subject]);
+
+    useEffect(() => {
+        setFourthFieldCompleted(chapter !== "");
+    }, [chapter]);
+
+    useEffect(() => {
+        setFifthFieldCompleted(type !== "" && (type !== "3" || (type === "3" && duration !== "0")));
+    }, [type, duration]);
 
     useEffect(() => {
         GradeDetails();
     }, [])
-    useEffect(() => {
 
-    },[data])
-    useEffect(() => {
-    }, [gradeDetailList, assignmentGrade, sectionList, section, subjectList, subject, type, duration, chapter])
     const GradeDetails = () => {
         getGradeDetails().then((res) => { setGradeDetailList(res?.data?.grade_details?.grade_details) });
     }
+
     const handleAssignmentName = (e) => {
         setAssignmentName(e.target.value);
     }
+
     const handleAssignmentGrade = (e) => {
         var sections;
         for (let i = 0; i < gradeDetailList.length; i++) {
@@ -58,12 +84,14 @@ const CreateAssignment = () => {
         setSectionList(sections);
         setAssignmentGrade(e.target.value);
     }
+
     const handleSection = async (e) => {
         const selectionId = e.target.value
         var subjects = await getLessonPlanMetadata(assignmentGrade, selectionId);
         setSubjectList(subjects?.data?.metadata);
         setSection(selectionId);
     }
+
     const handleSubject = (e) => {
         for (let i = 0; i < subjectList.length; i++) {
             if (subjectList[i].subject_name == e.target.value) {
@@ -74,18 +102,19 @@ const CreateAssignment = () => {
         setSubject({});
         return;
     }
+
     const handleChapter = (e) => {
         setChapter(e.target.value)
     }
+
     const handleType = (e) => {
         setType(e.target.value)
     }
+
     const handledurationb = (e) => {
         setDuration(e.target.value);
     }
-    const handleCancel = () => {
 
-    }
     const handleCreate = async () => {
         const data = {
             teacher_id: userDetails?.user_id,
@@ -97,15 +126,15 @@ const CreateAssignment = () => {
         const res = await createAssignment(data);
         navigate("/teacherDashboard/Assignment");
     }
+
     const handlequestion = () => {
         if (type == "3" && duration == "0") {
             setData({
                 name: "Create Assignment Error",
-                message: "You must input duration of Test"
+                message: "You must input the duration of the Test"
             })
             setShow(true);
-        }
-        else {
+        } else {
             const data = {
                 teacher_id: userDetails?.user_id,
                 assignment_name: assignmentName,
@@ -119,213 +148,223 @@ const CreateAssignment = () => {
         }
     }
 
-    useEffect(() => {
-        console.log(sectionList)
-        setSection("");
-        setSubjectList([]);
-    }, [sectionList])
-    useEffect(() => {
-        setSubject({});
-        setChapter("")
-    }, [subjectList]);
-    useEffect(() => {
-        console.log("hi")
-        setChapter("")
-    }, [subject])
-
-
     return (
-        <>
-            <Row>
-                <Col md={3} style={{ marginTop: "91px", width: "20%" }}>
-                    <TeacherSidebar />
-                </Col>
-                <Col md={9} style={{ width: "80%" }}>
-                    <div className="reportSection" >
-                        
-                        <Row
-                            style={{
-                                height: "74px",
-                                boxShadow: "0px 3px 6px #B4B3B329",
-                                position: "relative",
-                                left: "12px",
-                                width: "100%",
-                            }}
+        <div className="create-assignment-container">
+            <TeacherSidebar />
+
+            <div className="create-assignment-content">
+                <div className="header">
+                    <h4>Create Assignment</h4>
+                    <Button variant="outline-primary" onClick={() => navigate('/teacherDashboard/Assignment')}>
+                        Go to Assignments
+                    </Button>
+                </div>
+
+
+                <Form className="assignment-form">
+                    <Row className="mb-3">
+                        <Col md={6}>
+                            <Form.Group className="mb-3" controlId="name">
+                                <Form.Label>Assignment Name</Form.Label>
+                                <Form.Control
+                                    type="name"
+                                    placeholder="Assignment Name"
+                                    onChange={(e) => handleAssignmentName(e)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Select Grade</Form.Label>
+                                <Form.Select
+                                    name="grade"
+                                    onChange={(e) => handleAssignmentGrade(e)}
+                                >
+                                    <option value="">--Grade--</option>
+                                    {gradeDetailList?.map((grade) => (
+                                        <option value={grade.grade_id} key={grade.grade_id}>{grade.grade_id}</option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+
+                    <Row>
+                        {firstTwoFieldsCompleted && (
+                            <>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="fromSelectionId">
+                                        <Form.Label>Select Section</Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            className="lessonPlanSubject"
+                                            value={section}
+                                            disabled={assignmentGrade ? false : true}
+                                            onChange={(e) => handleSection(e)}
+                                        >
+                                            <option value="">--Section--</option>
+                                            {sectionList?.map((section) => (
+                                                <option value={section.section_id} key={section.section_id}>
+                                                    {section.section_name}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                                        <Form.Label>Select Subject</Form.Label>
+                                        <Form.Control
+                                            className="lessonPlanSubject"
+                                            as="select"
+                                            name="subject"
+                                            onClick={(e) => handleSubject(e)}
+                                        >
+                                            <option value="">--Subject--</option>
+                                            {subjectList?.map((subject) => (
+                                                <option key={subject.subject_id} value={subject.subject_name}>
+                                                    {subject.subject_name}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Col>
+                            </>
+                        )}
+                    </Row>
+                    <Row className="mb-3">
+                        {secondFieldCompleted && (
+                            <>
+                                <Col md={6} className="mb-3">
+                                    <Form.Group controlId="formBasicEmail">
+                                        <Form.Label>Chapter Number</Form.Label>
+                                        <Form.Control
+                                            className="lessonPlanSubject"
+                                            as="select"
+                                            name="chapter"
+                                            value={chapter}
+                                            onChange={(e) => handleChapter(e)}
+                                        >
+                                            <option value="">--Chapter--</option>
+                                            {subject ? (
+                                                <option key={subject.chapter_id} value={subject.chapter_id}>{subject.chapter_number}</option>
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6} className="mb-3">
+                                    <Form.Group controlId="formBasicEmail">
+                                        <Form.Label>Assignment Type</Form.Label>
+                                        <Form.Select
+                                            name="type"
+                                            onChange={e => handleType(e)}
+                                        >
+                                            <option value="">--Type--</option>
+                                            {assignmentTypes.map((type) => (
+                                                <option key={type.value} value={type.value}>{type.label}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </>
+                        )}
+                    </Row>
+
+                    {/* {thirdFieldCompleted && (
+                        <>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Row>
+                                    <Col md={3}>
+                                        <Form.Label>Chapter Number</Form.Label>
+                                    </Col>
+                                    <Col md={9}>
+                                        <Form.Control
+                                            className="lessonPlanSubject"
+                                            as="select"
+                                            name="chapter"
+                                            value={chapter}
+                                            onChange={(e) => handleChapter(e)}
+                                        >
+                                            <option value="">--Chapter--</option>
+                                            {subject ? (
+                                                <option key={subject.chapter_id} value={subject.chapter_id}>{subject.chapter_number}</option>
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </Form.Control>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </>
+                    )}
+
+                    {fourthFieldCompleted && (
+                        <>
+                            <Form.Group className="mb-3" controlId="formBasicEmail">
+                                <Row>
+                                    <Col md={3}>
+                                        <Form.Label>Assignment Type</Form.Label>
+                                    </Col>
+                                    <Col md={9}>
+                                        <Form.Select
+                                            name="type"
+                                            onChange={e => handleType(e)}
+                                        >
+                                            <option value="">--Type--</option>
+                                            {assignmentTypes.map((type) => (
+                                                <option key={type.value} value={type.value}>{type.label}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </>
+                    )}
+
+                    {fifthFieldCompleted && (
+                        <>
+                            {type === "3" && (
+                                <Form.Group className="mb-3" controlId="formBasicEmail">
+                                    <Form.Label>Duration</Form.Label>
+                                    <Form.Control
+                                        type="duration"
+                                        placeholder="Enter Duration"
+                                        onChange={(e) => handledurationb(e)}
+                                    />
+                                </Form.Group>
+                            )}
+                        </>
+                    )} */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                        <Button
+                            variant="outline-primary"
+                            onClick={() => handleCreate()}
+                            disabled={!(assignmentTypes && section && chapter && subject && type && assignmentName && assignmentGrade && duration)}
+                            style={{ cursor: 'pointer' }}
+                            className="custom-hover"
                         >
-                            <Col md={9}>
-                                <h4>Create Assignment</h4>
-                            </Col>
-                            <Col
-                                md={3}
-                                style={{ paddingTop: "17px" }}
-                                onClick={
-                                    () => {
-                                        navigate('/teacherDashboard/Assignment');
-                                    }
-                                }
-                            >
-                                <Button variant="outline-primary">Go to Assignments fff</Button>
-                            </Col>
-                        </Row>
-                        <Form>
-                            <Table style={{ marginTop: "30px" }}>
-                                <tr>
-                                    <td>
-                                        <Form.Group className="mb-3" controlId="name">
-                                            <Form.Label className='basic-label' style={{ fontSize: "22px" }}>Assignment Name</Form.Label>
-                                            <Form.Control
-                                                type="name"
-                                                placeholder="Assignment Name"
-                                                onChange={(e) => handleAssignmentName(e)}
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                            />
-                                        </Form.Group>
-                                    </td>
-                                    <td>
-                                        <Form.Group className="mb-3">
-                                            <Form.Label style={{ fontSize: "22px" }}>Select grade</Form.Label>
-                                            <Form.Select
-                                                className="lessonPlanSubject"
-                                                name="grade"
-                                                id="grade"
-                                                onChange={(e) => handleAssignmentGrade(e)}
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                            >
-                                                <option value="">--Grade--</option>
-                                                {gradeDetailList?.map((grade) => {
-                                                    return (
-                                                        <option value={grade.grade_id} key={grade.grade_id}>{grade.grade_id}</option>
-                                                    )
-                                                })}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-
-                                        <Form.Group className="mb-3" controlId="fromSelectionId">
-                                            <Form.Label style={{ fontSize: "22px" }} >Select Section</Form.Label>
-                                            <Form.Control
-                                                as="select"
-                                                className="lessonPlanSubject"
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                                value={section}
-                                                disabled={assignmentGrade?false:true}
-                                                onChange={e => handleSection(e)}
-                                            >
-                                                <option value="">--Section--</option>
-                                                {sectionList?.map((section) => {
-                                                    return (
-                                                        <option value={section.section_id} key={section.section_id}>{section.section_name}</option>
-                                                    )
-                                                })}
-                                            </Form.Control>
-                                        </Form.Group>
-                                    </td>
-                                    <td>
-                                        <Form.Group className="mb-3" controlId="fromSelectionId">
-                                            <Form.Label style={{ fontSize: "22px" }}>Select Subject</Form.Label>
-                                            <Form.Control
-                                                className="lessonPlanSubject"
-                                                as="select"
-                                                name="subject"
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                                // value={subject?.subject_name}
-                                                onClick={e => handleSubject(e)}
-                                            >
-                                                <option value="">--Subject--</option>
-                                                {subjectList?.map((subject) => {
-                                                    return (
-                                                        <option key={subject.subject_id} value={subject.subject_name}>{subject.subject_name}</option>
-                                                    )
-                                                })}
-                                            </Form.Control>
-                                        </Form.Group>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <Form.Group className="mb-3" controlId="formBasicEmail">
-                                            <Form.Label style={{ fontSize: "22px" }}>Chapter Number</Form.Label>
-                                            <Form.Control
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                                className="lessonPlanSubject"
-                                                as="select"
-                                                name="chapter"
-                                                value={chapter}
-                                                onChange={(e) => handleChapter(e)}
-                                            >
-                                                <option value="">--Chapter--</option>
-                                                {subject ? (<option key={subject.chapter_id} value={subject.chapter_id}>{subject.chapter_number}</option>)
-                                                    : (<></>)
-                                                }
-                                            </Form.Control>
-                                        </Form.Group>
-                                    </td>
-                                    <td>
-                                        <Form.Group className="mb-3" controlId="formBasicEmail">
-                                            <Form.Label style={{ fontSize: "22px" }}>Assignment Type</Form.Label>
-                                            <Form.Select
-                                                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                                name="type"
-                                                id="type"
-                                                onChange={e => handleType(e)}
-                                            >
-                                                <option value="">--Type--</option>
-                                                {assignmentTypes.map((type) => {
-                                                    return (
-                                                        <option key={type.value} value={type.value}>{type.label}</option>
-                                                    )
-                                                })}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </td>
-                                </tr>
-                                {
-                                    (type === "3") ? (
-                                        <tr>
-                                            <td>
-                                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                                    <Form.Label style={{ fontSize: "22px" }}>Duration</Form.Label>
-                                                    <Form.Control
-                                                        style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                                                        type="duration"
-                                                        placeholder="Enter Duration"
-                                                        onChange={(e) => handledurationb(e)}
-                                                    />
-                                                </Form.Group>
-                                            </td>
-                                            <td>
-
-                                            </td>
-
-                                        </tr>
-                                    ) : (
-                                        <></>
-                                    )
-                                }
-                            </Table>
-                            <Table>
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td style={{ width: "50%" }}>
-                                        <Button variant="outline-primary" onClick={() => handleCreate()} style={{ marginRight: "20px", marginLeft: "70px" }} disabled={!(assignmentTypes && section && chapter && subject && type && assignmentName && assignmentGrade && duration)}>Save & Draft</Button>
-                                        <Button variant="outline-primary" onClick={() => handlequestion()} disabled={!(assignmentTypes && section && chapter && subject && type && assignmentName && assignmentGrade && duration)}>
-                                            Save & Add question
-                                        </Button>
-                                    </td>
-                                </tr>
-                            </Table>
-                        </Form>
+                            Save & Draft
+                        </Button>
+                        <Button
+                            variant="outline-primary"
+                            onClick={() => handlequestion()}
+                            disabled={!(assignmentTypes && section && chapter && subject && type && assignmentName && assignmentGrade && duration)}
+                            style={{ cursor: 'pointer' }}
+                            className="custom-hover"
+                        >
+                            Save & Add Question
+                        </Button>
                     </div>
-                </Col>
-            </Row>
-            <CustomToast show={show} setShow={setShow} data={data} />
-        </>
+
+                </Form>
+
+                <CustomToast show={show} setShow={setShow} data={data} />
+            </div>
+        </div>
     );
 }
 
 export default CreateAssignment;
-

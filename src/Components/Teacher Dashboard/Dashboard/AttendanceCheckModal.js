@@ -6,7 +6,6 @@ const CheckAttendance = (props) => {
 
     const[verifyAndClose, setVerifyAndClose] = useState(false)
 
-    console.log("props - ", props)
 
     const takeAttendance = () => {
         const today = new Date()
@@ -14,7 +13,6 @@ const CheckAttendance = (props) => {
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const yyyy = today.getFullYear();
         const newData = `${yyyy}-${mm}-${dd}`
-        console.log("newData - ", newData)
         const attendanceData = {
           "absentees": props.absenteesList,
           "dress_defaulters": props.dressDList,
