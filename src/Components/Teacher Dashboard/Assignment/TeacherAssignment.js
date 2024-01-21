@@ -7,7 +7,7 @@ import { MdPublish } from "react-icons/md";
 import { BsFillPeopleFill, BsEyeFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import SaveAssignment from "./SaveAssignment";
-import { assignmentList, publishAssignmentData, getQuestions, deleteAssignment } from '../../../ApiClient'
+import { getGradeDetails, fetchAllSubjects, assignmentList, viewAssignemnt, publishAssignmentData, getQuestions, deleteAssignment } from '../../../ApiClient'
 import CreateNewAssignment from "./CreateNewAssignment";
 import { FaCheck } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
@@ -15,11 +15,11 @@ import CustomToast from "./Toast";
 import "./teacher.css";
 import { Modal } from 'react-bootstrap';
 import { Pagination } from "react-bootstrap";
-
+import SubmissionsComponent from "./SubmissionsComponent"
 
 const TeacherAssignment = () => {
   const userDetails = JSON.parse(localStorage.getItem('UserData'))
-  const id = userDetails.user_id;
+  const id = userDetails?.user_id;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [assignments, setAssignments] = useState({
@@ -32,7 +32,9 @@ const TeacherAssignment = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
   const [searchInput, setSearchInput] = useState("");
-
+  const [fetchsubjectId, setFetchSubjectId] = useState(null);
+  const [gradeId, setgradeId] = useState(null);
+  const [scetionId, setSectionId] = useState(null);
   const [sortOrder, setSortOrder] = useState({
     column: "assignment_name",
     direction: "asc",
@@ -156,8 +158,8 @@ const TeacherAssignment = () => {
           data: [tempArr],
         });
         setFilteredAssignments([tempArr]);
-        let subjects = tempAssignments?.map(({ subject_name }) => subject_name);
 
+        let subjects = tempAssignments?.map(({ subject_name }) => subject_name);
         let uniqueSubjects = [...new Set(subjects)];
 
         let types = tempAssignments?.map(
@@ -178,13 +180,11 @@ const TeacherAssignment = () => {
         console.log("ERR", err);
       }
     })();
-
   }, [deleteflag, publishflag, searchInput]);
+
 
   useEffect(() => {
     if (assignments.data.length > 0) {
-      console.log("hey", filters)
-      console.log(assignments.data[0]);
       const tempArr = assignments.data[0].filter((item) => {
         let pass = {
           subject: true,
@@ -193,49 +193,37 @@ const TeacherAssignment = () => {
           grade: true,
         };
 
-        if (filters.subject) {
-          if (item?.subject_name == filters.subject) {
-            pass.subject = true;
-          } else {
-            pass.subject = false;
-          }
+        if (filters.subject && item?.subject_name !== filters.subject) {
+          pass.subject = false;
         }
 
-        if (filters.type) {
-          if (item?.assignment_type_name == filters.type) {
-            pass.type = true;
-          } else {
-            pass.type = false;
-          }
+        if (filters.type && item?.assignment_type_name !== filters.type) {
+          pass.type = false;
         }
 
-        if (filters.grade) {
-          if (item?.grade == filters.grade) {
-            pass.grade = true;
-          } else {
-            pass.grade = false;
-          }
+        if (filters.grade && item?.grade !== filters.grade) {
+          pass.grade = false;
         }
 
         if (filters.status) {
-          if (filters.status == "published" && item?.is_published) {
+          if (
+            (filters.status === "published" && item?.is_published) ||
+            (filters.status === "draft" && !item.is_published)
+          ) {
             pass.status = true;
-          }
-          else if (filters.status == "draft" && !item.is_published) {
-            pass.status = true;
-          }
-          else {
+          } else {
             pass.status = false;
           }
         }
 
         return pass.subject && pass.type && pass.status && pass.grade;
       });
+
       const Arr = [tempArr];
-      console.log(Arr);
-      setFilteredAssignments(Arr)
+      setFilteredAssignments(Arr);
     }
   }, [filters]);
+
 
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -246,6 +234,13 @@ const TeacherAssignment = () => {
   const currentAssignments = sortedAssignments.slice(indexOfFirstAssignment, indexOfLastAssignment);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const [selectedAssignmentDetails, setSelectedAssignmentDetails] = useState({
+    grade: "",
+    section: "",
+    subject: "",
+  });
+
+
 
   const totalPages = Math.ceil(sortedAssignments.length / assignmentsPerPage);
   return (
@@ -260,24 +255,55 @@ const TeacherAssignment = () => {
               <Col md={9}>
                 <h4>Assignment</h4>
               </Col>
-              
-              <Col md={3} className="d-flex justify-content-end">
+              <Col md={3} className="d-flex justify-content-end align-items-center">
                 <Button variant="outline-primary" onClick={() => navigate('/teacherDashboard/CreateAssignment')}>
                   + Create New
                 </Button>
               </Col>
             </Row>
             <Row className="mb-4">
-            <Col md={3} className="d-flex justify-content-end">
+              <Col md={3} className="d-flex justify-content-start align-items-center">
                 <Form.Control
                   type="text"
-                  placeholder="Search Assignment-name"
+                  placeholder="Search Assignment Name"
                   value={searchInput}
                   onChange={handleSearch}
                 />
               </Col>
-              {/* <col md={2}> */}
+              <Col md={9} className="d-flex justify-content-end">
+                <div className="d-flex align-items-center">
+                  <Form.Label className="mr-2">Status:</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">Select Status</option>
+                    <option value="published">Published</option>
+                    <option value="draft">Draft</option>
+                  </Form.Control>
+                </div>
+                <div className="d-flex align-items-center ml-4">
+                  <Form.Label className="mr-2">Type:</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="type"
+                    value={filters.type}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">Select Type</option>
+                    {filterOptions.types.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </div>
+              </Col>
             </Row>
+
+
             <Table responsive striped bordered hover className="mb-4 ">
               <thead>
                 <tr>
@@ -334,8 +360,25 @@ const TeacherAssignment = () => {
                       )}
                       {item?.is_published && (
                         <>
-                          <BsEyeFill className="cursor-pointer h-6 w-6 text-[#676d71]" title="View" />
-                          <BsFillPeopleFill className="cursor-pointer h-6 w-6 text-[#676d71]" title="See Submissions" />
+                          <BsEyeFill
+                            className="cursor-pointer h-6 w-6 text-[#676d71]"
+                            title="View"
+                            onClick={() => {
+                              if (item?.assignment_id) {
+                                navigate(`/teacherDashboard/SubmissionsReport/${item?.assignment_id}`, { state: { assignment_id: item?.assignment_id } });
+                              }
+                            }}
+                          />
+
+
+
+
+                          <BsFillPeopleFill
+                            className="cursor-pointer h-6 w-6 text-[#676d71]"
+                            title="See Submissions"
+                            onClick={() => navigate(`/teacherDashboard/Submissions/${item?.assignment_id}`)}
+                          />
+                          {/* <BsFillPeopleFill className="cursor-pointer h-6 w-6 text-[#676d71]" title="See Submissions" /> */}
                         </>
                       )}
                     </td>

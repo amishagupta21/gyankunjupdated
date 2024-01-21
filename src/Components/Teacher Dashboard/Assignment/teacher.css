@@ -53,7 +53,9 @@ th {
 .table th,
 .table td {
   padding: 12px;
+
   border: 1px solid #e0e0e0;
+  
 }
 
 .table th {
@@ -64,14 +66,15 @@ th {
   position: sticky;
   top: 0;
   z-index: 2;
+  
 
 }
-.assignment-header{
+/* .assignment-header{
   border-top-left-radius: 30px;
 }
 .actions-header {
   border-top-right-radius: 30px;
-}
+} */
 .table tbody tr:hover {
   background-color: #f5f5f5;
 }
@@ -98,4 +101,18 @@ th {
   .table td {
     white-space: nowrap;
   }
+}
+.assignment-container {
+  margin-top: 20px; 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
 }

@@ -8,3 +8,8 @@
     font-size: medium;
     font-weight: 500;
 }
+.custom-badge {
+    margin-right: 5px;
+    font-size: 14px;
+    padding: 8px 12px;
+  }

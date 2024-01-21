@@ -57,7 +57,13 @@ const getReports = (grade, section, userType) => {
 const getResources = (grade, section, subject) => {
     return apiInstance.get(`/get_content?grade_id=${grade}&section_id=${section}&subject_id=${subject}`)
 }
+const getAllStudentsAssignmentReport = (AssignmentId) => {
+    return apiInstance.get(`/get_all_students_assignment_report?assignment_id=${AssignmentId}`);
+};
 
+const viewAssignemnt = (grade, section, subject) => {
+    return apiInstance.get(`view_assignment_report?teacher_id=teacher&grade_id=${grade}&section_id=${section}&subject_id=${subject}`);
+};
 const getGradeDetails = () => {
     return apiInstance.get(`/get_all_grade_details`)
 }
@@ -168,10 +174,13 @@ const getQuestions = (assignment_id) => {
 const deleteAssignment = (assignment_id) => {
     return apiInstance.delete(`/delete_assignment?assignment_id=${assignment_id}`);
 }
-
+const evaluteAssignment = (AssignmentId, student) => {
+    return apiInstance.get(`/evaluate_student_assignment?assignment_id=${AssignmentId}&student_id=${student}`)
+}
 
 export {
     //loginUser,
+    evaluteAssignment,
     deleteAssignment,
     getQuestions,
     createMasterRoutine,
@@ -199,6 +208,8 @@ export {
     saveAttendance,
     getLessonPlanMetadata,
     getTeachersData,
+    getAllStudentsAssignmentReport,
+    viewAssignemnt,
     lessonPlanAllDetails,
     verifyLessonPlan,
     viewNotification,

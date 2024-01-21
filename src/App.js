@@ -37,6 +37,9 @@ import ResourcesForStudents from './Components/Student Dashboard/Resources/Stude
 import NoticeForStudents from './Components/Student Dashboard/NoticeForStudents/NoticeForStudents';
 import NotificationsForStudent from './Components/Student Dashboard/Notification/StudentNotification';
 import Addquestions from './Components/Teacher Dashboard/Assignment/Addquestions';
+import SubmissionsPage from './Components/Teacher Dashboard/Assignment/SubmissionsComponent';
+import Viewreport from './Components/Teacher Dashboard/Assignment/Viewreport';
+import EvaluteAssignmentReport from './Components/Teacher Dashboard/Assignment/EvaluteAssignmentReport';
 
 
 function App() {
@@ -69,7 +72,9 @@ function App() {
           <Route path="/teacherDashboard/Resources" element={<ProtectedWrapper Component={ResourcesForTeacher} />} />
           <Route path="/teacherDashboard/Announcements" element={<ProtectedWrapper Component={NoticeForTeacher} />} />
           <Route path="/teacherDashboard/Notifications" element={<ProtectedWrapper Component={NotificationsForTeacher} />} />
-
+          <Route path="/teacherDashboard/Submissions/:assignmentId" element={<SubmissionsPage />} />
+          <Route path="/teacherDashboard/SubmissionsReport/:assignmentId" element={<Viewreport />} />
+          <Route path="/teacherDashboard/evaluteAssignment/:assignmentId/:studentId" element={<EvaluteAssignmentReport />} />
           <Route path="/studentDashboard/Dashboard" element={<ProtectedWrapper Component={StudentDashboard} />} />
           <Route path="/studentDashboard/Reports" element={<ProtectedWrapper Component={StudentReportSection} />} />
           <Route path="/studentDashboard/Assignment" element={<ProtectedWrapper Component={StudentAssigments} />} />
