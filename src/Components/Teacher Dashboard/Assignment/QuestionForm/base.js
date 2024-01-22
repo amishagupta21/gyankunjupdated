@@ -332,6 +332,7 @@ const handleMarks = (e) => {
                           required
                           onChange={(e) => handleMarks(e)}
                           value={marks}
+                          autoComplete="off"
                         />
                       </Form.Group>
                     </Col>
@@ -347,6 +348,7 @@ const handleMarks = (e) => {
                           className={`input ${(!isQuestionValid || isQuestionIncomplete) ? "is-invalid" : ""}`}
                           onChange={(e) => handleQuestionname(e)}
                           value={questionName}
+                          autoComplete="off"
                         />
                         {!isQuestionValid && isQuestionIncomplete && (
                           <Form.Control.Feedback type="invalid">
@@ -371,6 +373,7 @@ const handleMarks = (e) => {
                                 className="option"
                                 required
                                 value={item.value}
+                                autoComplete="off"
                               />
                             </Form.Group>
                           </Col>
@@ -418,6 +421,7 @@ const handleMarks = (e) => {
                               className="option"
                               required
                               value={item.value}
+                              autoComplete="off"
                             />
                           </Form.Group>
                         </Col>
@@ -466,6 +470,7 @@ const handleMarks = (e) => {
                               className="option"
                               required
                               value={item.value}
+                              autoComplete="off"
                             />
                           </Form.Group>
                         </Col>
@@ -499,6 +504,7 @@ const handleMarks = (e) => {
                             required
                             value={data.answer}
                             onChange={(e) => handleotherAnswer(e)}
+                            autoComplete="off"
                           />
                         </Col>
                       </Row>

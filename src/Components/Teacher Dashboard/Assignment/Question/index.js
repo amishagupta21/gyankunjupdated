@@ -7,15 +7,25 @@ const Question = ({ data, index, handleEdit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({ ...data });
   const [validationError, setValidationError] = useState(null);
-  
 
   const handleSaveEdit = () => {
-
+    const isEmptyOption = editedData.all_options.some((option) => !option.trim());
+    
+    if (isEmptyOption) {
+      setValidationError("All Options field cannot contain empty values");
+      return;
+    }
+  
+    if (!editedData.answer || (Array.isArray(editedData.answer) && editedData.answer.length === 0)) {
+      setValidationError("Answer cannot be empty");
+      return;
+    }
+  
     setValidationError(null);
-
     handleEdit(index, editedData);
     setIsEditing(false);
   };
+  
   const handleDeleteOption = (opIndex) => {
     const updatedOptions = [...editedData.all_options];
     updatedOptions.splice(opIndex, 1);
