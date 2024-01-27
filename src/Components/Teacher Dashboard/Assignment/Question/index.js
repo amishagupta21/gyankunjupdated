@@ -9,38 +9,41 @@ const Question = ({ data, index, handleEdit }) => {
   const [validationError, setValidationError] = useState(null);
 
   const handleSaveEdit = () => {
-    const isEmptyOption = editedData.all_options.some((option) => !option.trim());
-    
+    const isEmptyOption = editedData.all_options.some((option) => {
+      return typeof option === 'string' && !option.trim();
+    });
+
     if (isEmptyOption) {
       setValidationError("All Options field cannot contain empty values");
       return;
     }
-  
+
     if (!editedData.answer || (Array.isArray(editedData.answer) && editedData.answer.length === 0)) {
       setValidationError("Answer cannot be empty");
       return;
     }
-  
+
     setValidationError(null);
     handleEdit(index, editedData);
     setIsEditing(false);
   };
-  
+
+
   const handleDeleteOption = (opIndex) => {
     const updatedOptions = [...editedData.all_options];
     updatedOptions.splice(opIndex, 1);
-  
+
     const updatedAnswer = Array.isArray(editedData.answer)
       ? editedData.answer.filter((option) => option !== editedData.all_options[opIndex])
       : [];
-  
+
     setEditedData({
       ...editedData,
       all_options: updatedOptions,
       answer: updatedAnswer,
     });
   };
-  
+
   const renderOptions = () => {
     return (
       <Row>
@@ -63,15 +66,15 @@ const Question = ({ data, index, handleEdit }) => {
                 />
               </Col>
               <Col md={2}>
-              <Col md={2}>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => handleDeleteOption(opIndex)}
-            >
-              Delete
-            </Button>
-          </Col>
+                <Col md={2}>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDeleteOption(opIndex)}
+                  >
+                    Delete
+                  </Button>
+                </Col>
               </Col>
               <Col md={4}>
                 {editedData.type === "Single Select" ? (
@@ -138,11 +141,11 @@ const Question = ({ data, index, handleEdit }) => {
           <Form.Group className="mb-3">
             <Form.Label>Check Answer:</Form.Label>
             <Form.Control
-              type="text"
-              value={Array.isArray(editedData.answer) ? editedData.answer.join(", ") : editedData.answer}
-              onChange={(e) => setEditedData({ ...editedData, answer: e.target.value })}
-              readOnly
-            />
+  type="text"
+  value={Array.isArray(editedData.answer) ? editedData.answer.join(", ") : editedData.answer}
+  onChange={(e) => setEditedData({ ...editedData, answer: e.target.value })}
+/>
+
           </Form.Group>
 
           {editedData.type === "Single Select" && renderOptions()}
