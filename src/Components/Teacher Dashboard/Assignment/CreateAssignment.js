@@ -258,16 +258,25 @@ const CreateAssignment = () => {
                                 <Col md={6} className="mb-3">
                                     <Form.Group controlId="formBasicEmail">
                                         <Form.Label>Assignment Type</Form.Label>
-                                        <Form.Select
-                                            name="type"
-                                            onChange={e => handleType(e)}
-                                        >
+                                        <Form.Select name="type" onChange={e => handleType(e)}>
                                             <option value="">--Type--</option>
                                             {assignmentTypes.map((type) => (
                                                 <option key={type.value} value={type.value}>{type.label}</option>
                                             ))}
                                         </Form.Select>
                                     </Form.Group>
+                                    {type === "3" && (
+                                        <Form.Group className="mb-3" controlId="formBasicEmail">
+                                            <Form.Label>Duration</Form.Label>
+                                            <Form.Control
+                                                type="duration"
+                                                placeholder="Enter Duration"
+                                                value={duration}
+                                                onChange={(e) => handledurationb(e)}
+                                            />
+                                        </Form.Group>
+                                    )}
+
                                 </Col>
                             </>
                         )}
@@ -322,20 +331,22 @@ const CreateAssignment = () => {
                                 </Row>
                             </Form.Group>
                         </>
-                    )}
+                    )} */}
 
-                    {fifthFieldCompleted && (
+                    {/* {fifthFieldCompleted && (
                         <>
-                            {type === "3" && (
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Label>Duration</Form.Label>
-                                    <Form.Control
-                                        type="duration"
-                                        placeholder="Enter Duration"
-                                        onChange={(e) => handledurationb(e)}
-                                    />
-                                </Form.Group>
-                            )}
+                           {type === "3" && (
+    <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Label>Duration</Form.Label>
+        <Form.Control
+            type="duration"
+            placeholder="Enter Duration"
+            value={duration}
+            onChange={(e) => handledurationb(e)}
+        />
+    </Form.Group>
+)}
+
                         </>
                     )} */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>

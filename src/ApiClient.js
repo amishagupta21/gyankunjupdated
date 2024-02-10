@@ -124,7 +124,9 @@ const createLogBook = (data) => {
 const studentAssignmentList = (student) => {
     return apiInstance.get(`/get_student_assignments_list?student_id=${student}`)
 }
-
+const viewStudentAssignment = () => {
+    return apiInstance.put(`/submit_assignment`)
+}
 const studentRoutine = (grade, year) => {
     return apiInstance.get(`/view_class_routine?grade_id=${grade}&year=${year}`)
 }
@@ -188,6 +190,7 @@ export {
     viewLogBook,
     viewMasterRoutine,
     attendanceOverview,
+    viewStudentAssignment,
     getReports,
     getResources,
     getGradeDetails,

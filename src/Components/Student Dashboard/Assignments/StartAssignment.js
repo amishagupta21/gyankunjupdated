@@ -1,77 +1,288 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Modal, Row, Col, Table } from "react-bootstrap";
 import { loadAssignmentData } from '../../../ApiClient'
-import AnswerTypeFillTheBlank from "./AnswerTypeFillTheBlank";
-import AnswerTypeMultiSelect from "./AnswerTypeMultiSelect";
-import AnswerTypeSingleSelect from "./AnswerTypeSingleSelect";
-import AnswerTypeSubjective from "./AnswerTypeSubjective";
-import AnswerTypeUnJumble from "./AnswerTypeUnJumble";
+import { viewStudentAssignment } from '../../../ApiClient'
 import './studentAssignment.css'
-import { trackPromise } from "react-promise-tracker";
 
 const AssignmentSheet = (props) => {
 
   const [fullscreen, setFullscreen] = useState(true);
-  const [assignmentFullData, setassignmentFullData] = useState({})
-  const [dataFromChildComponent, setDataFromChildComponent] = useState([])
+  const [assignmentFullData, setassignmentFullData] = useState({});
   const [assignlist, setAssignList] = useState([]);
+  const [userAnswers, setUserAnswers] = useState({});
+
   const [show, setShow] = useState({
     show: false,
     index: ""
   });
+  const [timers, setTimers] = useState([]);
+  const [assignmentDuration, setAssignmentDuration] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [showTimeWarning, setShowTimeWarning] = useState(false);
+  const [showSubmitWarning, setShowSubmitWarning] = useState(false);
+
   useEffect(() => {
     fetchAssignmentData();
-  }, [])
-  useEffect(() => {
-    let arr = [];
-    Object.keys(assignmentFullData).map(key => arr.push(assignmentFullData[key]));
-    setAssignList(arr)
-  }, [assignmentFullData])
-  useEffect(() => {
-    console.log("Full data", assignmentFullData);
-    console.log("list", assignlist)
-  }, [assignlist])
-  useEffect(() => {
-    console.log("each", assignlist[show.index])
-  }, [show])
+  }, []);
 
-  const userDetails = JSON.parse(localStorage.getItem('UserData'))
+  useEffect(() => {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+  const handleBeforeUnload = async (event) => {
+    console.log("Handling before unload event");
+    if (props.assignmentType === "Test") {
+      event.preventDefault();
+      setShowSubmitWarning(true);
+      await submitAssignment();
+      event.returnValue = "";
+    }
+  };
+
+  useEffect(() => {
+    if (timeLeft === 14 && props.assignmentType === "Test") {
+      setShowTimeWarning(true);
+    }
+  }, [timeLeft, props.assignmentType]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (timeLeft > 0) {
+        setTimeLeft(timeLeft - 1);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [timeLeft]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const newTimeLeft = timeLeft - 1;
+      if (newTimeLeft >= 0) {
+        setTimeLeft(newTimeLeft);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [timeLeft]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (timeLeft > 0) {
+        setTimeLeft(timeLeft - 1);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const userDetails = JSON.parse(localStorage.getItem('UserData'));
 
   const fetchAssignmentData = () => {
-    const AssignmentId = props.assignmentId
-    const userId = userDetails?.user_id
+    const AssignmentId = props.assignmentId;
+    const userId = userDetails?.user_id;
     loadAssignmentData(AssignmentId, userId)
       .then((res) => {
-        console.log("RES", res)
-        setassignmentFullData(res.data.assignment_data)
+        console.log("RES", res);
+        setassignmentFullData(res.data.assignment_data);
+        setAssignList(Object.values(res.data.assignment_data));
+        setTimers(new Array(Object.values(res.data.assignment_data).length).fill({ startTime: null, endTime: null, elapsedTime: 0 }));
+        setAssignmentDuration(res.data.assignment_duration);
       })
-      .catch((err) => console.log("AssignmentData err - ", err))
-  }
+      .catch((err) => console.log("AssignmentData err - ", err));
+  };
 
-
-  const handle = (data,idx) => {
-    setAssignList(prev => {
-      const newArr = [...prev];
-      newArr[idx] = data;
-      return newArr
-    })
-    console.log("Update",assignlist);
-  }
-
+  useEffect(() => {
+    if (assignmentDuration !== null) {
+      setTimeLeft(assignmentDuration * 60);
+    }
+  }, [assignmentDuration]);
   const handleShowQuestion = (index) => {
+    if (show.index !== "") {
+      const newTimers = [...timers];
+      newTimers[show.index].endTime = Date.now();
+      newTimers[show.index].elapsedTime += newTimers[show.index].endTime - newTimers[show.index].startTime;
+      setTimers(newTimers);
+    }
+
+    const questionId = `question_number_${index + 1}`;
+    setUserAnswers(prevState => ({
+      ...prevState,
+      [questionId]: ""
+    }));
+
     setShow({
       show: true,
       index: index
-    })
-  }
+    });
+    startTimer(index);
+  };
 
-  //console.log("dataFromChildComponent - ", dataFromChildComponent)
+
+  const startTimer = (index) => {
+    const newTimers = [...timers];
+    newTimers[index] = { startTime: Date.now(), endTime: null, elapsedTime: 0 };
+    setTimers(newTimers);
+  };
+
+  const handleSubmitAssignment = () => {
+    if (show.index !== "") {
+      const newTimers = [...timers];
+      newTimers[show.index].endTime = Date.now();
+      newTimers[show.index].elapsedTime += newTimers[show.index].endTime - newTimers[show.index].startTime;
+      setTimers(newTimers);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    if (seconds <= 0) {
+      return "Time's up!";
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes} min ${remainingSeconds} seconds`;
+  };
+
+
+
+  const handleUserAnswerChange = (value, questionId) => {
+    setUserAnswers(prevState => ({
+      ...prevState,
+      [questionId]: value
+    }));
+  };
+
+  const submitAssignment = () => {
+    const assignmentData = assignlist.map((question, index) => {
+      const questionId = `question_number_${index + 1}`;
+      const startTime = timers[index]?.startTime;
+      const endTime = timers[index]?.endTime;
+      const elapsedTime = endTime && startTime ? (endTime - startTime) / 1000 : 0;
+      return {
+        [questionId]: {
+          type: question.type,
+          question: question.question,
+          selected_answer: userAnswers[questionId],
+          all_options: question.all_options,
+          marks: question.marks,
+          time_taken: "1 min 30 seconds"
+        }
+      };
+    });
+
+    const requestBody = {
+      student_id: userDetails.user_id,
+      assignment_data: Object.assign({}, ...assignmentData),
+      overall_time: timeLeft > 0 ? formatTime(timeLeft) : "Time's up!",
+      assignment_id: props.assignmentId,
+      submit_data: true
+    };
+
+    const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwdWJsaWNfaWQiOiI0ODJjOTgxNS1iOWQ0LTRlNGYtOGJiNi0zOTRjODUyZDM1NWUiLCJleHAiOjI2NTMxMzc2MDV9.JPYYukYqWOulGx_JBHehSzKMpFalemeBxJsL6jDkWjA'; // Replace 'your-access-token' with the actual access token
+
+    fetch('http://13.200.112.20:5005/submit_assignment', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-tokens': accessToken
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Assignment submitted successfully:', data);
+      })
+      .catch(error => {
+        console.error('Error submitting assignment:', error);
+      });
+  };
+
+  const saveProgress = () => {
+    const assignmentData = assignlist.map((question, index) => {
+      const questionId = `question_number_${index + 1}`;
+      return {
+        [questionId]: {
+          type: question.type,
+          question: question.question,
+          selected_answer: userAnswers[questionId],
+          all_options: question.all_options,
+          marks: question.marks,
+          time_taken: "1 min 30 seconds"//static time
+        }
+      };
+    });
+
+    const requestBody = {
+      student_id: userDetails.user_id,
+      assignment_data: Object.assign({}, ...assignmentData),
+      overall_time: formatTime(30 * 1000),
+      assignment_id: props.assignmentId,
+      submit_data: false
+    };
+
+    const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwdWJsaWNfaWQiOiI0ODJjOTgxNS1iOWQ0LTRlNGYtOGJiNi0zOTRjODUyZDM1NWUiLCJleHAiOjI2NTMxMzc2MDV9.JPYYukYqWOulGx_JBHehSzKMpFalemeBxJsL6jDkWjA';  // Replace 'your-access-token' with the actual access token
+
+    fetch('http://13.200.112.20:5005/submit_assignment', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-tokens': accessToken
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        props.setAssignmentFullList(prevState => ({
+          ...prevState,
+          student_assignments: prevState.student_assignments.map(assignment => {
+            if (assignment.assignment_id === props.assignmentId) {
+              return {
+                ...assignment,
+                assignment_status: "Inprogress"
+              };
+            }
+            return assignment;
+          })
+        }));
+        return response.json();
+      })
+
+      .then(data => {
+        console.log('Progress saved successfully:', data);
+      })
+      .catch(error => {
+        console.error('Error saving progress:', error);
+      });
+
+  };
+
+
+  useEffect(() => {
+    if (timeLeft === 14 && props.assignmentType === "Test") {
+      setShowTimeWarning(true);
+      setTimeout(() => {
+        setShowTimeWarning(false);
+      }, 3000);
+    }
+  }, [timeLeft, props.assignmentType]);
+
+
 
 
   return (
     <>
       <Modal
-        className="ModalBody" 
+        className="ModalBody"
         {...props}
         fullscreen={fullscreen}
         aria-labelledby="contained-modal-title-vcenter"
@@ -83,140 +294,206 @@ const AssignmentSheet = (props) => {
           borderRadius: "4px 4px 0px 0px",
           opacity: "1",
         }}>
-          <Modal.Title className="assignmentHeader" >Assignment</Modal.Title>
+          <Col md={8} className="assignmentName">
+            Name of the assignment: <b>{props?.assignmentName}</b>
+          </Col>
+          <Col md={4} className="assignmentName">
+            {props.assignmentType !== "Test" && (
+              <Button variant="primary" onClick={saveProgress}>Save Progress</Button>
+            )}
+          </Col>
+          {showSubmitWarning && (
+            <div className="submit-warning">
+              <p>Your assignment will be auto-submitted in a few seconds.</p>
+            </div>
+          )}
+
         </Modal.Header>
         <Modal.Body>
-          <div className="assignmentNameHeader">
-            <Row>
-              <Col md={12} className="assignmentName">
-                Name of the assignment: <b>{props?.assignmentName}</b>
-              </Col>
-            </Row>
-            {props.assignmentType === "Test" && <Row>
-              <Col md={12} className="assignmentName">
-                Duration: 60 minutes
-              </Col>
-            </Row>}
-          </div>
-          <Row>
-            <Col md={4} style={{ height: "auto", width: "30%", border: "1px solid #EFF1F4", marginBottom: "10px", background: "#FFFFFF 0% 0% no-repeat padding-box", boxShadow: "0px 3px 6px #B4B3B329", borderRadius: "8px 8px 0px 0px" }}>
-              <Row>
-                <Table striped hover>
-                  <thead>
-                    <tr style={{
-                      background: "#7A9ABF 0% 0% no-repeat padding-box",
-                      borderRadius: "4px 4px 0px 0px",
-                      opacity: "1",
-                    }}>
-                      <th className="questionSetHeaderText">Questions Set</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {assignlist?.map((eachQuestion, indx) => {
-                      return (
+          <Modal.Body>
+            <div className="assignmentNameHeader">
+              {props.assignmentType === "Test" && (
+                <Row>
+                  <Col md={2} className="assignmentName">
+                    <div className="duration-container">
+                      {timeLeft > 0 ? (
                         <>
-                          <tr>
-                            <td className="questionSetText" onClick={() => handleShowQuestion(indx)}>Q.{indx + 1} {eachQuestion?.question}</td>
-                          </tr>
+                          <div className="duration-text">Duration: {formatTime(timeLeft)}</div>
                         </>
+                      ) : (
+                        <div>Time's up!</div>
+                      )}
 
-                        // <Col md={10} className="questionSetHeader">
-                        //   <p className="questionSetText" onClick={() => handleShowQuestion(indx)}>Q.{indx + 1} {eachQuestion?.question}</p>
-                        // </Col>
-                      )
-                    })}
-                  </tbody>
-                </Table>
-              </Row>
-            </Col>
-            <Col md={8} style={{ marginBottom: "10px", marginLeft: "10px", border: "1px solid #EFF1F4", background: "#FFFFFF 0% 0% no-repeat padding-box", boxShadow: "0px 3px 6px #B4B3B329", borderRadius: "8px 8px 0px 0px" }}>
-              {show?.show ? (
-                <>
-                  {assignlist[show.index].type === "4" ? (
-                    <>
-                      <AnswerTypeSubjective question={assignlist[show.index]} handle={handle} idx = {show.index}/>
-                    </>
-                  ) : (<></>)}
-                  {assignlist[show.index].type === "1" ? (
-                    <>
-                    </>
-                  ) : (<></>)}
-                  {assignlist[show.index].type === "2" ? (
-                    <>
-                      <AnswerTypeMultiSelect question={assignlist[show.index]} handle={handle} idx = {show.index} />
-                    </>
-                  ) : (<></>)}
-                  {assignlist[show.index].type === "3" ? (
-                    <>
-                    </>
-                  ) : (<></>)}
-                </>
-              ) : (<></>)}
-            </Col>
 
-            {/* {assignmentFullData?.assignment_data?.assignmentDataForStudent?.map(
-                (answerType, indx) => {
-                  return (
-                    answerType?.type === "multiple_choice(radio)" && (
-                      <AnswerTypeSingleSelect
-                        assignmentFullData={assignmentFullData}
-                      />
-                    )
-                  );
-                }
+                    </div>
+                  </Col>
+                  {timeLeft > 0 && (
+                    <Col md={10} className="progress-ring">
+                      <div className="progress-ring">
+                        <svg className="progress-circle" width="60" height="60">
+                          <circle
+                            className="progress-circle"
+                            stroke="#4CAF50"
+                            strokeWidth="8"
+                            fill="transparent"
+                            r="26"
+                            cx="30"
+                            cy="30"
+                            style={{
+                              strokeDasharray: 2 * Math.PI * 26,
+                              strokeDashoffset: `calc(${2 * Math.PI * 26} - (${2 * Math.PI * 26} * ${timeLeft} / (${assignmentDuration * 60})))`
+                            }}
+                          />
+                        </svg>
+                      </div>
+                    </Col>
+                  )}
+                </Row>
               )}
-              
+            </div>
+          </Modal.Body>
 
-              {assignmentFullData?.assignment_data?.assignmentDataForStudent?.map(
-                (answerType, indx) => {
-                  return (
-                    answerType?.type === "multiple_choice(checkbox)" && (
-                      <AnswerTypeMultiSelect
-                        assignmentFullData={assignmentFullData}
+          <Modal
+            show={showTimeWarning}
+            onHide={() => setShowTimeWarning(false)}
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Time Warning</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Hurry up! Only 14 seconds remaining.
+            </Modal.Body>
+            <Modal.Footer>
+              {/* <Button variant="secondary" onClick={() => setShowTimeWarning(false)}>OK</Button> */}
+            </Modal.Footer>
+          </Modal>
+          <div className="card-container">
+            {assignlist?.map((question, index) => (
+              <div key={index} className="questionCard" onClick={() => handleShowQuestion(index)}> {/* Added onClick handler */}
+                <div className="questionSetText">
+                  Q.{index + 1} {question?.question}
+                </div>
+                <div className="answerCard">
+                  <div>
+                    <strong>Type:</strong> {question.type}
+                  </div>
+                  {timers[index] && (
+                    <div>
+                      {timers[index].startTime && <p>Start Time: {new Date(timers[index].startTime).toLocaleTimeString()}</p>}
+                      {timers[index].endTime && <p>End Time: {new Date(timers[index].endTime).toLocaleTimeString()}</p>}
+                      {timers[index].startTime && timers[index].endTime && (
+                        <p>Elapsed Time: {formatTime((timers[index].endTime - timers[index].startTime) / 1000)}</p>
+                      )}
+                    </div>
+
+                  )}
+                  {question.type === "Single Select" && (
+                    <>
+                      {question.type === "Single Select" && (
+                        <>
+                          <p><strong>Options:</strong></p>
+                          <ul>
+                            {question.all_options.map((option, idx) => (
+                              <li key={idx}>
+                                <label>
+                                  <input
+                                    type="radio"
+                                    name={`question-${index}`}
+                                    value={option}
+                                    checked={userAnswers[`question_number_${index + 1}`] === option || question.selected_answer === option} 
+                                    onChange={() => handleUserAnswerChange(option, `question_number_${index + 1}`)} 
+                                  />
+                                  {option}
+                                  {question.selected_answer === option && ( 
+                                    <span> - Selected</span>
+                                  )}
+                                </label>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+
+                    </>
+                  )}
+                  {question.type === "Multi Select" && (
+                    <>
+                      <p><strong>Question:</strong> {question.question}</p>
+                      <p><strong>Options:</strong></p>
+                      <ul>
+                        {question.all_options.map((option, idx) => (
+                          <li key={idx}>
+                            <label>
+                              <input
+                                type="checkbox"
+                                name={`question-${index}`}
+                                value={option}
+                                checked={userAnswers[`question_number_${index + 1}`]?.includes(option) || (question.selected_answer && question.selected_answer.includes(option))} 
+                                onChange={(e) => {
+                                  const isChecked = e.target.checked;
+                                  const selectedOptions = userAnswers[`question_number_${index + 1}`] || [];
+                                  const updatedOptions = isChecked
+                                    ? [...selectedOptions, option]
+                                    : selectedOptions.filter(selectedOption => selectedOption !== option);
+                                  handleUserAnswerChange(updatedOptions, `question_number_${index + 1}`);
+                                }}
+                              />
+                              {option}
+                              {question.selected_answer && question.selected_answer.includes(option) && ( 
+                                <span> - Selected</span>
+                              )}
+                            </label>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+
+
+                  {question.type === "Fill the Blank" && (
+                    <>
+                      <p><strong>Question:</strong> {question.question}</p>
+                      <p><strong>Answer:</strong></p>
+                      <textarea
+                        className="answerTextArea"
+                        rows={4}
+                        cols={50}
+                        placeholder="Type your answer here..."
+                        value={userAnswers[`question_number_${index + 1}`] || question.selected_answer} 
+                        onChange={(e) => handleUserAnswerChange(e.target.value, `question_number_${index + 1}`)}
                       />
-                    )
-                  );
-                }
-              )}
-              
+                    </>
+                  )}
 
-              {assignmentFullData?.assignment_data?.assignmentDataForStudent?.map(
-                (answerType, indx) => {
-                  return (
-                    answerType?.type === "subjective" && (
-                      <AnswerTypeSubjective
-                        assignmentFullData={assignmentFullData}
+                  {question.type === "Write Answer" && (
+                    <>
+                      <p><strong>Question:</strong> {question.question}</p>
+                      <p><strong>Answer:</strong></p>
+                      <textarea
+                        className="answerTextArea"
+                        rows={4}
+                        cols={50}
+                        placeholder="Type your answer here..."
+                        value={userAnswers[`question_number_${index + 1}`] || question.selected_answer} 
+                        onChange={(e) => handleUserAnswerChange(e.target.value, `question_number_${index + 1}`)}
                       />
-                    )
-                  );
-                }
-              )}
-              
+                    </>
+                  )}
 
-              {assignmentFullData?.assignment_data?.assignmentDataForStudent?.map(
-                (answerType, indx) => {
-                  return (
-                    answerType?.type === "unjumble" && (
-                      <AnswerTypeUnJumble
-                        assignmentFullData={assignmentFullData}
-                      />
-                    )
-                  );
-                }
-              )}               */}
-          </Row>
-
-          {/* <AnswerTypeMultiSelect />
-                <AnswerTypeSingleSelect />
-                <AnswerTypeSubjective />
-                <AnswerTypeUnJumble /> */}
+                </div>
+              </div>
+            ))}
+          </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="outline-primary">Submit Assignment</Button>
+          <Button variant="outline-primary" onClick={submitAssignment}>Submit Assignment</Button>
+
         </Modal.Footer>
       </Modal>
     </>
   );
+
 };
 
 export default AssignmentSheet;
