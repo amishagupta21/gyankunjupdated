@@ -12,7 +12,7 @@ const EvaluteAssignmentReport = () => {
     const [obtainedMarks, setObtainedMarks] = useState(null);
     const [percentage, setPercentage] = useState(null);
     const [marksForWriteAnswer, setMarksForWriteAnswer] = useState({});
-    
+
 
     useEffect(() => {
         evaluteAssignment(assignmentId, studentId)
@@ -24,13 +24,13 @@ const EvaluteAssignmentReport = () => {
                 console.error('Error evaluating assignment:', error);
             });
     }, [assignmentId, studentId]);
-  const handleMarksForWriteAnswerChange = (questionNumber, event) => {
-    const marks = parseFloat(event.target.value) || 0;
-    setMarksForWriteAnswer((prevMarks) => ({
-      ...prevMarks,
-      [questionNumber]: marks,
-    }));
-  };
+    const handleMarksForWriteAnswerChange = (questionNumber, event) => {
+        const marks = parseFloat(event.target.value) || 0;
+        setMarksForWriteAnswer((prevMarks) => ({
+            ...prevMarks,
+            [questionNumber]: marks,
+        }));
+    };
 
     const handleEvaluateAssignment = () => {
         const totalPossibleMarks = Object.values(evaluationData.student_response)
@@ -64,15 +64,13 @@ const EvaluteAssignmentReport = () => {
                                 <div className="left-section" style={{ textAlign: 'left' }}>
                                     <p>Question: {evaluationData.student_response[questionNumber].question}</p>
                                     {evaluationData.student_response[questionNumber].type !== 'Single Select' &&
-                                        evaluationData.student_response[questionNumber].type !== 'Multi Select' && (
-                                            <div>
-                                                <p>
-                                                    <strong>Answer:</strong> {Array.isArray(evaluationData.student_response[questionNumber].answer)
-                                                        ? evaluationData.student_response[questionNumber].answer.join(', ')
-                                                        : evaluationData.student_response[questionNumber].answer}
-                                                </p>
-                                            </div>
-                                        )}
+    evaluationData.student_response[questionNumber].type !== 'Multi Select' && (
+        <div>
+            <p>
+                <strong>Answer:</strong> {evaluationData.student_response[questionNumber].selected_answer}
+            </p>
+        </div>
+)}
                                     <p>
                                         {evaluationData.student_response[questionNumber].type === 'Single Select' ? (
                                             evaluationData.student_response[questionNumber].all_options.map((option, index) => (
@@ -81,7 +79,10 @@ const EvaluteAssignmentReport = () => {
                                                         type="radio"
                                                         className="form-check-input"
                                                         id={`option_${index}`}
-                                                        checked={evaluationData.student_response[questionNumber].answer.includes(option)}
+                                                        checked={
+                                                            evaluationData.student_response[questionNumber].answer &&
+                                                            evaluationData.student_response[questionNumber].answer === option
+                                                        }
                                                         readOnly
                                                     />
                                                     <label className="form-check-label" htmlFor={`option_${index}`}>
@@ -90,13 +91,18 @@ const EvaluteAssignmentReport = () => {
                                                 </div>
                                             ))
                                         ) : evaluationData.student_response[questionNumber].type === 'Multi Select' ? (
+
+
                                             evaluationData.student_response[questionNumber].all_options.map((option, index) => (
                                                 <div key={index} className="form-check">
                                                     <input
                                                         type="checkbox"
                                                         className="form-check-input"
                                                         id={`option_${index}`}
-                                                        checked={evaluationData.student_response[questionNumber].answer.includes(option)}
+                                                        checked={
+                                                            evaluationData.student_response[questionNumber].selected_answer &&
+                                                            evaluationData.student_response[questionNumber].selected_answer.includes(`${index}-${option}`)
+                                                        }
                                                         readOnly
                                                     />
                                                     <label className="form-check-label" htmlFor={`option_${index}`}>
@@ -104,25 +110,29 @@ const EvaluteAssignmentReport = () => {
                                                     </label>
                                                 </div>
                                             ))
+
+
                                         ) : (
                                             null
                                         )}
                                     </p>
                                     {evaluationData.student_response[questionNumber].type === 'Write Answer' && (
-        <div className="write-answer-marks">
-          <Form.Group controlId={`marksForWriteAnswer_${questionNumber}`}>
-            <Form.Label>Marks for Write Answer</Form.Label>
-            <Form.Control
-  type="text"  
-  placeholder="Enter marks"
-  value={marksForWriteAnswer[questionNumber] || ''}
-  onChange={(event) => handleMarksForWriteAnswerChange(questionNumber, event)}
-  style={{ width: '30%' }}
-/>
+                                        <div className="write-answer-marks">
+                                            <Form.Group controlId={`marksForWriteAnswer_${questionNumber}`}>
+                                                <Form.Label>Marks for Write Answer</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    placeholder="Enter marks"
+                                                    value={marksForWriteAnswer[questionNumber] || ''}
+                                                    onChange={(event) => handleMarksForWriteAnswerChange(questionNumber, event)}
+                                                    style={{ width: '30%' }}
+                                                />
+                                            </Form.Group>
 
-          </Form.Group>
-        </div>
-      )}
+                                            
+                                        </div>
+                                    )}
+
 
                                 </div>
                                 <div className="right-section">
@@ -153,7 +163,7 @@ const EvaluteAssignmentReport = () => {
                     <Form.Group controlId="obtainedMarks">
                         <Form.Label>Obtained Marks</Form.Label>
                         <Form.Control
-                             type="text" 
+                            type="text"
                             placeholder="Enter obtained marks"
                             value={obtainedMarks}
                             onChange={handleObtainedMarksChange}
