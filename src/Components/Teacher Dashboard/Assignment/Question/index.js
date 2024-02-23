@@ -126,11 +126,11 @@ const Question = ({ data, index, handleEdit }) => {
 
 
   return (
-    <div className="mb-5 border p-3">
+    <div className="mb-5 border p-3 question-container">
       {isEditing ? (
         <div>
           <Form.Group className="mb-3">
-            <Form.Label>Edit Question:</Form.Label>
+            <Form.Label style={{ fontWeight: 'bold' }}>Edit Question:</Form.Label>
             <Form.Control
               type="text"
               value={editedData.question}
@@ -139,7 +139,7 @@ const Question = ({ data, index, handleEdit }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Check Answer:</Form.Label>
+            <Form.Label style={{ fontWeight: 'bold' }}>Check Answer:</Form.Label>
             <Form.Control
   type="text"
   value={Array.isArray(editedData.answer) ? editedData.answer.join(", ") : editedData.answer}
@@ -152,7 +152,7 @@ const Question = ({ data, index, handleEdit }) => {
           {editedData.type === "Multi Select" && renderOptions()}
 
           <Form.Group className="mb-3">
-            <Form.Label>Edit Marks:</Form.Label>
+            <Form.Label style={{ fontWeight: 'bold' }}>Edit Marks:</Form.Label>
             <Form.Control
               type="text"
               value={editedData.marks}
@@ -174,7 +174,7 @@ const Question = ({ data, index, handleEdit }) => {
         <div>
           <Row className="mb-3">
             <Col md={2}>
-              <span className="questiondetail">Question:</span>
+              <span className="questiondetail" style={{ fontWeight: 'bold' }}>Question:</span>
             </Col>
             <Col md={6}>
               <span className="questiondetail">{data.question}</span>
@@ -182,14 +182,14 @@ const Question = ({ data, index, handleEdit }) => {
             <Col md={2} className="d-flex justify-content-end align-items-center">
               {!isEditing && (
                 <>
-                  <span className="questiondetail">Marks:</span>
+                  <span className="questiondetail" style={{ fontWeight: 'bold' }}>Marks:</span>
                   <span className="badge text-bg-success ms-2">{data.marks}</span>
                 </>
               )}
             </Col>
             <Col md={2} className="d-flex justify-content-end align-items-center">
               {!isEditing && (
-                <Button variant="outline-primary" onClick={() => setIsEditing(true)} className="me-3">
+                <Button variant="outline-primary" onClick={() => setIsEditing(true)} className="me-3" style={{ fontWeight: 'bold' }}>
                   Edit
                 </Button>
               )}
@@ -198,7 +198,7 @@ const Question = ({ data, index, handleEdit }) => {
 
           <Row className="mb-3">
             <Col md={2}>
-              <span className="questiondetail">Answer:</span>
+              <span className="questiondetail" style={{ fontWeight: 'bold' }}>Answer:</span>
             </Col>
             <Col md={10}>
               {Array.isArray(data.answer)
@@ -209,7 +209,7 @@ const Question = ({ data, index, handleEdit }) => {
           {["Single Select", "Multi Select"].includes(data.type) && (
             <Row className="mb-3">
               <Col md={2}>
-                <span className="questiondetail">All Options:</span>
+                <span className="questiondetail" style={{ fontWeight: 'bold' }}>All Options:</span>
               </Col>
               <Col md={10}>
                 {console.log("data.all_options", data.all_options)}

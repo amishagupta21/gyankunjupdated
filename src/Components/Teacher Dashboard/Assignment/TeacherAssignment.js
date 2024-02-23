@@ -272,12 +272,13 @@ const TeacherAssignment = () => {
               </Col>
               <Col md={9} className="d-flex justify-content-end">
                 <div className="d-flex align-items-center">
-                  <Form.Label className="mr-2">Status:</Form.Label>
+                  <Form.Label className="mr-2" style={{ marginRight: '10px',fontWeight: 'bold', fontSize: '18px' }}>Status:</Form.Label>
                   <Form.Control
                     as="select"
                     name="status"
                     value={filters.status}
                     onChange={handleFilterChange}
+                    style={{ marginRight: '10px', width: '150px' }}
                   >
                     <option value="">Select Status</option>
                     <option value="published">Published</option>
@@ -285,12 +286,13 @@ const TeacherAssignment = () => {
                   </Form.Control>
                 </div>
                 <div className="d-flex align-items-center ml-4">
-                  <Form.Label className="mr-2">Type:</Form.Label>
+                  <Form.Label className="mr-2" style={{ marginRight: '10px', fontWeight: 'bold', fontSize: '18px' }}>Type:</Form.Label>
                   <Form.Control
                     as="select"
                     name="type"
                     value={filters.type}
                     onChange={handleFilterChange}
+                    style={{ width: '150px' }}
                   >
                     <option value="">Select Type</option>
                     {filterOptions.types.map((type) => (
@@ -302,6 +304,7 @@ const TeacherAssignment = () => {
                 </div>
               </Col>
             </Row>
+
 
 
             <Table responsive striped bordered hover className="mb-4 ">

@@ -154,6 +154,7 @@ const currentAssignments = filteredAssignments.slice(indexOfFirstAssignment, ind
                                   assignmentType={assignment.assignment_type_name}
                                   assignmentName={assignment.assignment_name}
                                   setAssignmentFullList={setAssignmentFullList}
+                                  assignmentStatus={assignment.assignment_status === 'Submitted'} 
                                 />
                               )}
                             </td>

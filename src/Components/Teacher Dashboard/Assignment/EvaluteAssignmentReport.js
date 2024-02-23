@@ -57,20 +57,20 @@ const EvaluteAssignmentReport = () => {
             </Col>
             <Col md={6} style={{ marginLeft: '100px' }}>
                 <div className="evaluation-report" style={{ marginTop: '100px' }}>
-                    <div className="section">
+                    <div className="section" style={{ width: '100%', margin: '0 auto' }}>
                         <h2>Submitted Assignment</h2>
                         {Object.keys(evaluationData.student_response).map((questionNumber) => (
                             <div key={questionNumber} className="question">
                                 <div className="left-section" style={{ textAlign: 'left' }}>
-                                    <p>Question: {evaluationData.student_response[questionNumber].question}</p>
+                                    <p style={{ fontWeight: 'bold' }}>Question: {evaluationData.student_response[questionNumber].question}</p>
                                     {evaluationData.student_response[questionNumber].type !== 'Single Select' &&
-    evaluationData.student_response[questionNumber].type !== 'Multi Select' && (
-        <div>
-            <p>
-                <strong>Answer:</strong> {evaluationData.student_response[questionNumber].selected_answer}
-            </p>
-        </div>
-)}
+                                        evaluationData.student_response[questionNumber].type !== 'Multi Select' && (
+                                            <div>
+                                                <p>
+                                                    <strong style={{ fontWeight: 'bold' }}>Answer:</strong> {evaluationData.student_response[questionNumber].selected_answer}
+                                                </p>
+                                            </div>
+                                        )}
                                     <p>
                                         {evaluationData.student_response[questionNumber].type === 'Single Select' ? (
                                             evaluationData.student_response[questionNumber].all_options.map((option, index) => (
@@ -79,38 +79,39 @@ const EvaluteAssignmentReport = () => {
                                                         type="radio"
                                                         className="form-check-input"
                                                         id={`option_${index}`}
-                                                        checked={
-                                                            evaluationData.student_response[questionNumber].answer &&
-                                                            evaluationData.student_response[questionNumber].answer === option
-                                                        }
+                                                        value={option}
+                                                        checked={evaluationData.student_response[questionNumber].selected_answer === option}
                                                         readOnly
                                                     />
-                                                    <label className="form-check-label" htmlFor={`option_${index}`}>
+                                                    <label className={`form-check-label ${evaluationData.student_response[questionNumber].selected_answer === option ? 'selected' : ''}`} htmlFor={`option_${index}`}>
                                                         {option}
                                                     </label>
                                                 </div>
                                             ))
                                         ) : evaluationData.student_response[questionNumber].type === 'Multi Select' ? (
-
-
-                                            evaluationData.student_response[questionNumber].all_options.map((option, index) => (
-                                                <div key={index} className="form-check">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="form-check-input"
-                                                        id={`option_${index}`}
-                                                        checked={
-                                                            evaluationData.student_response[questionNumber].selected_answer &&
-                                                            evaluationData.student_response[questionNumber].selected_answer.includes(`${index}-${option}`)
-                                                        }
-                                                        readOnly
-                                                    />
-                                                    <label className="form-check-label" htmlFor={`option_${index}`}>
-                                                        {option}
-                                                    </label>
-                                                </div>
-                                            ))
-
+                                            (() => {
+                                                const selectedAnswers = evaluationData.student_response[questionNumber].selected_answer;
+                                                console.log('Selected Answers:', selectedAnswers);
+                                                return evaluationData.student_response[questionNumber].all_options.map((option, index) => {
+                                                    return (
+                                                        <div key={index} className="form-check">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id={`option_${index}`}
+                                                                checked={
+                                                                    selectedAnswers &&
+                                                                    selectedAnswers.some(answer => answer.includes(option))
+                                                                }
+                                                                readOnly
+                                                            />
+                                                            <label className="form-check-label" htmlFor={`option_${index}`}>
+                                                                {option}
+                                                            </label>
+                                                        </div>
+                                                    );
+                                                });
+                                            })()
 
                                         ) : (
                                             null
@@ -119,7 +120,7 @@ const EvaluteAssignmentReport = () => {
                                     {evaluationData.student_response[questionNumber].type === 'Write Answer' && (
                                         <div className="write-answer-marks">
                                             <Form.Group controlId={`marksForWriteAnswer_${questionNumber}`}>
-                                                <Form.Label>Marks for Write Answer</Form.Label>
+                                                <Form.Label  style={{ fontWeight: 'bold' }}>Marks for Write Answer</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="Enter marks"
@@ -129,7 +130,7 @@ const EvaluteAssignmentReport = () => {
                                                 />
                                             </Form.Group>
 
-                                            
+
                                         </div>
                                     )}
 
@@ -138,14 +139,14 @@ const EvaluteAssignmentReport = () => {
                                 <div className="right-section">
                                     <p>
                                         {/* <span>Time Taken: {evaluationData.student_response[questionNumber].time_taken}</span> */}
-                                        <span>Marks: {evaluationData.student_response[questionNumber].marks}</span>
+                                        <span  style={{ fontWeight: 'bold' }}>Marks: {evaluationData.student_response[questionNumber].marks}</span>
                                     </p>
-                                    <p>Type: {evaluationData.student_response[questionNumber].type}</p>
+                                    <p  style={{ fontWeight: 'bold' }}>Type: {evaluationData.student_response[questionNumber].type}</p>
                                     <p>
                                         {evaluationData.student_response[questionNumber].is_correct ? (
-                                            <span>Correct: ✔</span>
+                                            <span  style={{ fontWeight: 'bold' }}>Correct: ✔</span>
                                         ) : (
-                                            <span>Incorrect: ✘</span>
+                                            <span  style={{ fontWeight: 'bold' }}>Incorrect: ✘</span>
                                         )}
                                     </p>
                                 </div>
@@ -161,7 +162,7 @@ const EvaluteAssignmentReport = () => {
                 </div>
                 <Form>
                     <Form.Group controlId="obtainedMarks">
-                        <Form.Label>Obtained Marks</Form.Label>
+                        <Form.Label style={{ fontWeight: 'bold' }}>Obtained Marks</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Enter obtained marks"

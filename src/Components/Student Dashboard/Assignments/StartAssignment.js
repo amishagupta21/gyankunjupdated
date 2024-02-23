@@ -5,6 +5,7 @@ import { viewStudentAssignment } from '../../../ApiClient'
 import './studentAssignment.css'
 
 const AssignmentSheet = (props) => {
+  console.log("Assignment Status:", props.assignmentStatus);
 
   const [fullscreen, setFullscreen] = useState(true);
   // const [assignmentFullData, setassignmentFullData] = useState({});
@@ -28,6 +29,12 @@ const AssignmentSheet = (props) => {
   }, []);
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
   const [instructionsClosed, setInstructionsClosed] = useState(false);
+  const [elapsedTimes, setElapsedTimes] = useState({});
+  const { assignmentStatus } = props;
+
+  const areFieldsDisabled = () => {
+    return assignmentStatus;
+  };
 
   useEffect(() => {
     if (props.assignmentType === 'Test') {
@@ -107,16 +114,69 @@ const AssignmentSheet = (props) => {
 
 
   const handleShowQuestion = (index) => {
+    if (show.index !== "") {
+      const newTimers = [...timers];
+      const now = Date.now();
+      const elapsed = now - newTimers[show.index].startTime;
+      newTimers[show.index].endTime = now;
+      newTimers[show.index].elapsedTime += elapsed;
+      setTimers(newTimers);
+  
+      const newElapsedTimes = { ...elapsedTimes };
+      newElapsedTimes[show.index] = newTimers[show.index].elapsedTime;
+      setElapsedTimes(newElapsedTimes);
+    }
+  
+    startTimerForQuestion(index);
+  
+    setShow({
+      show: true,
+      index: index
+    });
+  };
+  const startTimerForQuestion = (index) => {
     const newTimers = [...timers];
-    const now = Date.now();
-    newTimers[index] = { startTime: now, endTime: null, elapsedTime: newTimers[index]?.elapsedTime || 0 };
+    newTimers[index] = { startTime: Date.now(), endTime: null, elapsedTime: elapsedTimes[index] || 0 };
     setTimers(newTimers);
+  };
+  const handleQuestionCardClick = (index) => {
+    if (show.index !== "") {
+      const newTimers = [...timers];
+      const now = Date.now();
+      const elapsed = now - newTimers[show.index].startTime;
+      newTimers[show.index].endTime = now;
+      newTimers[show.index].elapsedTime += elapsed;
+      setTimers(newTimers);
+
+      const newElapsedTimes = { ...elapsedTimes };
+      newElapsedTimes[show.index] = newTimers[show.index].elapsedTime;
+      setElapsedTimes(newElapsedTimes);
+    }
+
+    startTimerForQuestion(index);
+    handleShowQuestion(index);
     setShow({
       show: true,
       index: index
     });
   };
 
+  const handleMoveToQuestion = (index) => {
+    if (show.index !== "") {
+      const newTimers = [...timers];
+      const now = Date.now();
+      const elapsed = now - newTimers[show.index].startTime;
+      newTimers[show.index].endTime = now;
+      newTimers[show.index].elapsedTime += elapsed;
+      setTimers(newTimers);
+
+      const newElapsedTimes = { ...elapsedTimes };
+      newElapsedTimes[show.index] = newTimers[show.index].elapsedTime;
+      setElapsedTimes(newElapsedTimes);
+    }
+
+    startTimerForQuestion(index);
+  };
   const handleSubmitAnswer = (index) => {
     const newTimers = [...timers];
     const now = Date.now();
@@ -127,12 +187,22 @@ const AssignmentSheet = (props) => {
   };
 
   const formatElapsedTime = (elapsedTime) => {
-    const minutes = Math.floor(elapsedTime / 60000);
-    const seconds = Math.floor((elapsedTime % 60000) / 1000);
-    return `${minutes} min ${seconds} seconds`;
+    const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+    const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+  
+    let formattedTime = '';
+    if (hours > 0) {
+      formattedTime += hours + 'h ';
+    }
+    if (minutes > 0 || hours > 0) {
+      formattedTime += minutes + 'm ';
+    }
+    formattedTime += seconds + 's';
+  
+    return formattedTime;
   };
-
-
+  
 
   const startTimer = (index) => {
     const newTimers = [...timers];
@@ -352,10 +422,11 @@ const AssignmentSheet = (props) => {
               Name of the assignment: <b>{props?.assignmentName}</b>
             </Col>
             <Col md={4} className="assignmentName">
-              {props.assignmentType !== "Test" && (
-                <Button variant="primary" onClick={saveProgress}>Save Progress</Button>
-              )}
-            </Col>
+  {!props.assignmentStatus && props.assignmentType !== "Test" && (
+    <Button variant="primary" onClick={saveProgress}>Save Progress</Button>
+  )}
+</Col>
+
             {showSubmitWarning && (
               <div className="submit-warning">
                 <p>Your assignment will be auto-submitted in a few seconds.</p>
@@ -424,7 +495,7 @@ const AssignmentSheet = (props) => {
             </Modal>
             <div className="card-container">
               {assignlist?.map((question, index) => (
-                <div key={index} className="question-card" onClick={() => handleShowQuestion(index)}>
+                <div key={index} className="question-card" onClick={() => handleQuestionCardClick(index)}>
                   <div className="question-text">
                     Q.{index + 1} {question?.question}
                   </div>
@@ -445,6 +516,7 @@ const AssignmentSheet = (props) => {
                             <li key={idx}>
                               <label className="option-label">
                                 <input
+                                disabled={areFieldsDisabled()}
                                   type="radio"
                                   name={`question-${index}`}
                                   value={option}
@@ -478,6 +550,7 @@ const AssignmentSheet = (props) => {
                             <li key={idx}>
                               <label className="option-label">
                                 <input
+                                disabled={areFieldsDisabled()}
                                   type="checkbox"
                                   name={`question-${index}`}
                                   value={`${index}-${option}`}
@@ -493,7 +566,7 @@ const AssignmentSheet = (props) => {
                                       updatedOptions = (userAnswers[`question_number_${index + 1}`] || []).filter(selectedOption => selectedOption !== option);
                                     }
 
-                                    console.log("Updated options:", updatedOptions);
+                                    // console.log("Updated options:", updatedOptions);
 
                                     handleUserAnswerChange(updatedOptions, `question_number_${index + 1}`);
                                   }}
@@ -519,6 +592,7 @@ const AssignmentSheet = (props) => {
                           placeholder="Type your answer here..."
                           value={userAnswers[`question_number_${index + 1}`] || question.selected_answer}
                           onChange={(e) => handleUserAnswerChange(e.target.value, `question_number_${index + 1}`)}
+                          disabled={areFieldsDisabled()}
                         />
                       </div>
                     )}
@@ -529,9 +603,11 @@ const AssignmentSheet = (props) => {
 
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="outline-primary" onClick={submitAssignment}>Submit Assignment</Button>
+  {!props.assignmentStatus && (
+    <Button variant="outline-primary" onClick={submitAssignment}>Submit Assignment</Button>
+  )}
+</Modal.Footer>
 
-          </Modal.Footer>
         </Modal>
       )}
       <Modal
