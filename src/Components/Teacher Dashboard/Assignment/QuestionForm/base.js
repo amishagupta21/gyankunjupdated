@@ -169,24 +169,24 @@ const BaseQuestion = (props) => {
       answer: e.target.value,
     });
   };
-const handleMarks = (e) => {
-  const inputValue = e.target.value;
-  const numericRegex = /^[0-9]*$/; 
+  const handleMarks = (e) => {
+    const inputValue = e.target.value;
+    const numericRegex = /^[0-9]*$/;
 
-  if (numericRegex.test(inputValue) || inputValue === "") {
-    setMarks(inputValue);
-  }
-};
+    if (numericRegex.test(inputValue) || inputValue === "") {
+      setMarks(inputValue);
+    }
+  };
 
   const addOptions = () => {
     if ((single || multi) && data.options.length !== 4) {
       const isOptionFieldEmpty = data.options.some((option) => option.value.trim() === '');
-  
+
       if (isOptionFieldEmpty) {
         alert('Option field should not be empty!');
         return;
       }
-  
+
       setData({
         ...data,
         options: [
@@ -200,7 +200,7 @@ const handleMarks = (e) => {
       });
     }
   };
-  
+
   const deleteOption = (id) => {
     const tempArr = data?.options.filter((item) => item.id !== id);
     setData({
@@ -345,11 +345,13 @@ const handleMarks = (e) => {
                           type="text"
                           placeholder={fill ? "Enter Question with __" : "Enter Question..."}
                           size="sm"
-                          className={`input ${(!isQuestionValid || isQuestionIncomplete) ? "is-invalid" : ""}`}
+                          className={`${(!isQuestionValid || isQuestionIncomplete) ? "is-invalid" : ""}`}
+                          style={{ borderColor: fill ? "red" : "blue" }}
                           onChange={(e) => handleQuestionname(e)}
                           value={questionName}
                           autoComplete="off"
                         />
+
                         {!isQuestionValid && isQuestionIncomplete && (
                           <Form.Control.Feedback type="invalid">
                             Question must include '__'.
@@ -426,7 +428,7 @@ const handleMarks = (e) => {
                           </Form.Group>
                         </Col>
                         <Col md={2}>
-                          <Form.Check label={"true"} onChange={() => handleTrigger(item.id)} />
+                          <Form.Check onChange={() => handleTrigger(item.id)} />
                         </Col>
                         <Col md={2}>
                           {data?.options.length > 1 && (

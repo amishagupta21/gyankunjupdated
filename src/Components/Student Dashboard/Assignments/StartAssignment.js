@@ -121,14 +121,14 @@ const AssignmentSheet = (props) => {
       newTimers[show.index].endTime = now;
       newTimers[show.index].elapsedTime += elapsed;
       setTimers(newTimers);
-  
+
       const newElapsedTimes = { ...elapsedTimes };
       newElapsedTimes[show.index] = newTimers[show.index].elapsedTime;
       setElapsedTimes(newElapsedTimes);
     }
-  
+
     startTimerForQuestion(index);
-  
+
     setShow({
       show: true,
       index: index
@@ -190,7 +190,7 @@ const AssignmentSheet = (props) => {
     const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
     const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-  
+
     let formattedTime = '';
     if (hours > 0) {
       formattedTime += hours + 'h ';
@@ -199,10 +199,10 @@ const AssignmentSheet = (props) => {
       formattedTime += minutes + 'm ';
     }
     formattedTime += seconds + 's';
-  
+
     return formattedTime;
   };
-  
+
 
   const startTimer = (index) => {
     const newTimers = [...timers];
@@ -303,7 +303,7 @@ const AssignmentSheet = (props) => {
       })
       .then(data => {
         console.log('Assignment submitted successfully:', data);
-        // window.location.href = "/studentDashboard/Assignment";
+        window.location.href = "/studentDashboard/Assignment";
       })
       .catch(error => {
         console.error('Error submitting assignment:', error);
@@ -381,7 +381,7 @@ const AssignmentSheet = (props) => {
 
       .then(data => {
         console.log('Progress saved successfully:', data);
-        // window.location.href = "/studentDashboard/Assignment";
+        window.location.href = "/studentDashboard/Assignment";
       })
       .catch(error => {
         console.error('Error saving progress:', error);
@@ -422,10 +422,10 @@ const AssignmentSheet = (props) => {
               Name of the assignment: <b>{props?.assignmentName}</b>
             </Col>
             <Col md={4} className="assignmentName">
-  {!props.assignmentStatus && props.assignmentType !== "Test" && (
-    <Button variant="primary" onClick={saveProgress}>Save Progress</Button>
-  )}
-</Col>
+              {!props.assignmentStatus && props.assignmentType !== "Test" && (
+                <Button variant="primary" onClick={saveProgress}>Save Progress</Button>
+              )}
+            </Col>
 
             {showSubmitWarning && (
               <div className="submit-warning">
@@ -516,7 +516,7 @@ const AssignmentSheet = (props) => {
                             <li key={idx}>
                               <label className="option-label">
                                 <input
-                                disabled={areFieldsDisabled()}
+                                  disabled={areFieldsDisabled()}
                                   type="radio"
                                   name={`question-${index}`}
                                   value={option}
@@ -533,7 +533,7 @@ const AssignmentSheet = (props) => {
                                 />
                                 <span className="option-text">{option}</span>
                                 {userAnswers[`question_number_${index + 1}`] === option && (
-                                  <span className="selected-indicator"> - Selected</span>
+                                  <span className="selected-indicator"></span>
                                 )}
                               </label>
                             </li>
@@ -550,7 +550,7 @@ const AssignmentSheet = (props) => {
                             <li key={idx}>
                               <label className="option-label">
                                 <input
-                                disabled={areFieldsDisabled()}
+                                  disabled={areFieldsDisabled()}
                                   type="checkbox"
                                   name={`question-${index}`}
                                   value={`${index}-${option}`}
@@ -562,7 +562,7 @@ const AssignmentSheet = (props) => {
 
                                     if (isChecked) {
                                       updatedOptions = [...(userAnswers[`question_number_${index + 1}`] || []), option];
-                                    } else { 
+                                    } else {
                                       updatedOptions = (userAnswers[`question_number_${index + 1}`] || []).filter(selectedOption => selectedOption !== option);
                                     }
 
@@ -573,7 +573,7 @@ const AssignmentSheet = (props) => {
                                 />
                                 <span className="option-text">{option}</span>
                                 {question.selected_answer && question.selected_answer.includes(option) && (
-                                  <span className="selected-indicator"> - Selected</span>
+                                  <span className="selected-indicator"></span>
                                 )}
                               </label>
                             </li>
@@ -603,10 +603,10 @@ const AssignmentSheet = (props) => {
 
           </Modal.Body>
           <Modal.Footer>
-  {!props.assignmentStatus && (
-    <Button variant="outline-primary" onClick={submitAssignment}>Submit Assignment</Button>
-  )}
-</Modal.Footer>
+            {!props.assignmentStatus && (
+              <Button variant="outline-primary" onClick={submitAssignment}>Submit Assignment</Button>
+            )}
+          </Modal.Footer>
 
         </Modal>
       )}
