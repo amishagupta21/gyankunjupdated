@@ -43,21 +43,22 @@ const SubmissionsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {submissions.map((submission) => (
-                <tr key={submission?.student_id}>
-                  <td>{submission?.name}</td>
-                  <td>{submission?.status}</td>
-                  <td>{submission?.student_id}</td>
-                  <td className="d-flex gap-2">
-                  <FaCheckCircle
-                      className="cursor-pointer h-6 w-6 text-[#4caf50]"
-                      title="Evaluate Assignment"
-                      onClick={() => navigate(`/teacherDashboard/evaluteAssignment/${assignmentId}/${submission?.student_id}`)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {submissions && submissions.map((submission) => (
+    <tr key={submission?.student_id}>
+      <td>{submission?.name}</td>
+      <td>{submission?.status}</td>
+      <td>{submission?.student_id}</td>
+      <td className="d-flex gap-2">
+        <FaCheckCircle
+          className="cursor-pointer h-6 w-6 text-[#4caf50]"
+          title="Evaluate Assignment"
+          onClick={() => navigate(`/teacherDashboard/evaluteAssignment/${assignmentId}/${submission?.student_id}`)}
+        />
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </Table>
         </Col>
       </Row>

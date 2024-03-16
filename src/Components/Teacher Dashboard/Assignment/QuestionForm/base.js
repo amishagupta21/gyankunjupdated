@@ -246,12 +246,12 @@ const BaseQuestion = (props) => {
     const selectedType = e.target.value;
 
     switch (selectedType) {
-      case "Single Select":
+      case "multiple_choice(radio)":
         setSingle(true);
         setMulti(false);
         setfill(false);
         setOther(false);
-        setType("Single Select");
+        setType("multiple_choice(radio)");
         break;
       case "Multi Select":
         setSingle(false);
@@ -313,7 +313,7 @@ const BaseQuestion = (props) => {
                           value={type}
                         >
                           <option value="">Select Type</option>
-                          <option value="Single Select">Single Select</option>
+                          <option value="multiple_choice(radio)">multiple_choice(radio)</option>
                           <option value="Multi Select">Multi Select</option>
                           <option value="Fill the Blank">Fill the Blank</option>
                           <option value="Write Answer">Write Answer</option>

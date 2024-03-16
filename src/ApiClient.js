@@ -99,6 +99,9 @@ const viewStudentAttendance = (grade, section, month) => {
 const getAllStudentsData = (grade, section) => {
     return apiInstance.get(`/get_all_students?grade_id=${grade}&section_id=${section}`)
 }
+const getAllChapterName = (grade, section) => {
+    return apiInstance.get(`/get_subject_chapters?grade_id=${grade}&section_id=${section}`)
+}
 
 const viewAllNotice = (userId) => {
     return apiInstance.get(`/view_all_notices?user_id=${userId}`)
@@ -137,6 +140,9 @@ const saveAttendance = (attendanceData) => {
 
 const getTeachersData = () => {
     return apiInstance.get(`/get_all_teachers`)
+}
+const getSubjectData = () => {
+    return apiInstance.get(`/get_all_subjects`)
 }
 
 const lessonPlanAllDetails = (lessonId) => {
@@ -211,6 +217,8 @@ export {
     saveAttendance,
     getLessonPlanMetadata,
     getTeachersData,
+    getSubjectData,
+    getAllChapterName,
     getAllStudentsAssignmentReport,
     viewAssignemnt,
     lessonPlanAllDetails,
